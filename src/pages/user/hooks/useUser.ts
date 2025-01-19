@@ -148,8 +148,8 @@ export const useUser = () => {
             fullName: Yup.string().min(10).max(30, 'Debe de tener minimo 10  y maximo 30 caracteres').required('Requerido'),
             email: Yup.string().email('debe ser un email valido').required('Requerido'),
             avatar: Yup.string().max(10, 'Ingrese imagen'),
-            password: Yup.string().min(6, 'La contraseña debe tener más de 6 caracteres').required().notOneOf(['it-jr'], 'Esta opción no es permitida'),
-            passwordConfirmation: Yup.string().min(6, 'La contraseña debe tener más de 6 caracteres').oneOf([Yup.ref('password')], 'La contraseñas no son iguales')
+            password: Yup.string().min(6, 'La contraseña debe tener más de 6 caracteres').max(30, 'la contraseña tiene un largo maximo de 30 caracteres').required().notOneOf(['it-jr'], 'Esta opción no es permitida'),
+            passwordConfirmation: Yup.string().min(6, 'La contraseña debe tener más de 6 caracteres').max(30, 'la contraseña tiene un largo maximo de 30 caracteres').oneOf([Yup.ref('password')], 'La contraseñas no son iguales')
         })
     });
 

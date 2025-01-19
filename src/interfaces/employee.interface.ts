@@ -19,13 +19,12 @@ export interface Employees {
 
 export interface employeeBody {
     rut: string;
-    fullname: string;
+    fullName: string;
     email: string;
     salary: number;
-    hiredate: string;
+    hireDate: string;
     city: string;
     address: string;
-    available: boolean;
     type: string;
 }
 

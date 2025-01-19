@@ -1,7 +1,5 @@
 import { devtools } from "zustand/middleware";
-import { UserService } from "../../services/user.service";
 import { StateCreator, create } from "zustand";
-import { Users } from "../../interfaces";
 import { immer } from "zustand/middleware/immer";
 import { employeeBody, Employees } from "../../interfaces/employee.interface";
 import { EmployeeService } from "../../services/employee.service";
@@ -10,10 +8,10 @@ export interface EmployeeState {
     employees: Employees[];
     count: number;
     getEmployees: (skip: number, take: number, { }: any) => Promise<void>;
-    createEmployee: (user: employeeBody) => Promise<void>;
+    createEmployee: (employee: employeeBody) => Promise<void>;
     deleteEmployee: (id: number) => void;
     changeStatus: (id: number, status: boolean) => void;
-    updateEmployee: (user: Users) => void;
+    updateEmployee: (employee: Employees) => void;
 
 }
 
@@ -58,7 +56,6 @@ const storeApi: StateCreator<EmployeeState, [["zustand/devtools", never], ["zust
 
         try {
             const data = await EmployeeService.changeStatus(id, status);
-
             console.log(data);
         } catch (error) {
             console.log(error)
@@ -67,10 +64,10 @@ const storeApi: StateCreator<EmployeeState, [["zustand/devtools", never], ["zust
     },
     updateEmployee: async (employeeData) => {
 
-        const { id, ...employee } = employeeData;
+
 
         try {
-            const data = await UserService.updateUser(id, employee);
+            const data = await EmployeeService.updateEmployee(employeeData);
 
             console.log(data);
         } catch (error) {

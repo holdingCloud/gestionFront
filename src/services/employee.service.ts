@@ -1,7 +1,7 @@
 import { AxiosError } from 'axios';
 import { gestionApi } from '../api/gestion.api';
 import { pagination } from '../interfaces/pagination.interface';
-import { employeeBody, EmployeeResponse } from '../interfaces/employee.interface';
+import { employeeBody, EmployeeResponse, Employees } from '../interfaces/employee.interface';
 
 
 export class EmployeeService {
@@ -67,7 +67,9 @@ export class EmployeeService {
         }
     }
 
-    static updateEmployee = async (id: number, employee: employeeBody) => {
+    static updateEmployee = async (employee: Employees) => {
+
+        const { id } = employee;
 
         try {
             const { data } = await gestionApi.put(`/employee/${id}`, employee);

@@ -1,6 +1,4 @@
-import { Grid, DialogContent, DialogContentText, TextField, InputAdornment, IconButton, DialogActions, Button, MenuItem } from "@mui/material"
-
-import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { Grid, DialogContent, DialogContentText, TextField, DialogActions, Button, MenuItem, FormControl, FormHelperText, InputLabel, Select } from "@mui/material"
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -18,12 +16,17 @@ export const EmployeeForm = ({
     errors,
     hiddeButton,
     saveUpdate,
-    cancelUpdate }: any) => {
+    cancelUpdate,
+    setFieldValue }: any) => {
 
 
     const [value, setValue] = useState<Dayjs | null>(timezonedDayjs);
 
     const currencies = [
+        {
+            value: 0,
+            label: 'Seleccione una opción',
+        },
         {
             value: 1,
             label: 'ADMINISTRADOR',
@@ -77,11 +80,11 @@ export const EmployeeForm = ({
                         size="small"
                         name="fullName"
                         label="Nombre completo"
-                        value={values.fullname}
+                        value={values.fullName}
                         onChange={handleChange}
                         onBlur={handleBlur}
-                        error={touched.fullname && Boolean(errors.fullname)}
-                        helperText={touched.fullname && errors.fullname}
+                        error={touched.fullName && Boolean(errors.fullName)}
+                        helperText={touched.fullName && errors.fullName}
                     />
 
                     <TextField
@@ -110,21 +113,19 @@ export const EmployeeForm = ({
 
                     <LocalizationProvider
                         dateAdapter={AdapterDayjs} >
-                        <DemoContainer
-                            sx={{
-                                marginTop: -1
-                            }}
-                            components={['DatePicker']}
-                        >
-                            <DatePicker
-                                label="Fecha de contrato"
-                                format="DD-MM-YYYY"
-                                name="fecha"
-                                value={value}
-                                slotProps={{ textField: { size: 'small' } }}
-                                onChange={(newValue) => setValue(newValue)}
-                            />
-                        </DemoContainer>
+                        <DatePicker
+                            label="Fecha de contrato"
+                            format="DD-MM-YYYY"
+                            name="hireDate"
+                            value={value}
+                            slotProps={{ textField: { size: 'small' } }}
+                            onChange={
+                                (newValue) => {
+                                    setValue(newValue);
+                                    setFieldValue("hireDate", newValue?.format('DD-MM-YYYY'));
+                                }
+                            }
+                        />
                     </LocalizationProvider>
 
                     <TextField
@@ -142,8 +143,8 @@ export const EmployeeForm = ({
                     <TextField
                         fullWidth
                         size="small"
-                        name="Dirección"
-                        label="address"
+                        name="address"
+                        label="Dirección"
                         value={values.address}
                         onChange={handleChange}
                         onBlur={handleBlur}
@@ -151,13 +152,19 @@ export const EmployeeForm = ({
                         helperText={touched.address && errors.address}
                     />
 
+
                     <TextField
                         id="outlined-select-currency"
                         select
-                        label="Repartidor"
-                        defaultValue="1"
+                        label="Función"
+                        name="type"
+                        defaultValue="0"
                         size="small"
-                        helperText="Selecciona un repartidor"
+                        value={values.type}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        error={touched.type && Boolean(errors.type)}
+                        helperText={touched.type && errors.type}
                     >
                         {currencies.map((option) => (
                             <MenuItem key={option.value} value={option.value}>
@@ -165,6 +172,7 @@ export const EmployeeForm = ({
                             </MenuItem>
                         ))}
                     </TextField>
+
 
 
 

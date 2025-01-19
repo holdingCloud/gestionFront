@@ -9,7 +9,9 @@ export const useEmployee = () => {
     const employees = useEmployeeStore(state => state.employees);
     const count = useEmployeeStore(state => state.count);
     const getEmployees = useEmployeeStore(state => state.getEmployees);
-
+    const deleteEmployee = useEmployeeStore(state => state.deleteEmployee);
+    const createEmployee = useEmployeeStore(state => state.createEmployee);
+    const updateEmployee = useEmployeeStore(state => state.updateEmployee);
 
     const { enqueueSnackbar } = useSnackbar();
 
@@ -18,6 +20,7 @@ export const useEmployee = () => {
     const [open, setOpen] = useState<boolean>(false);
     const [filter, setFilter] = useState<{ fullname: string, email: string }>({ fullname: "", email: "" });
     const [page, setPage] = useState(0);
+    const [deleteId, setDeleteId] = useState<number>(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [skip, setSkip] = useState(0);
 
@@ -49,7 +52,12 @@ export const useEmployee = () => {
 
     const saveUpdate = () => {
 
+        const dataUpdate = {
+            id: deleteId,
+            ...values
+        }
 
+        //updateEmployee(dataUpdate);
         enqueueSnackbar('Usuario actualizado exitosamente', { variant: 'success' });
         resetForm();
 
@@ -59,11 +67,11 @@ export const useEmployee = () => {
 
     }
 
-    const handleUpdate = ({ password, passwordConfirmation, ...data }: any) => {
+    const handleUpdate = ({ ...data }: any) => {
         setHiddeButton(false);
         setCreateModal(true);
-        //setDeleteId(data.id);
-        setValues({ ...data, password: "", passwordConfirmation: "" });
+        setDeleteId(data.id);
+        setValues({ ...data });
     }
 
     const handleActive = (id: number, status: boolean) => {
@@ -76,7 +84,7 @@ export const useEmployee = () => {
     }
 
     const handleDelete = (id: number) => {
-        // setDeleteId(id);
+        setDeleteId(id);
         setOpen(true);
     }
 
@@ -89,7 +97,7 @@ export const useEmployee = () => {
     const onClose = (action: boolean) => {
         setOpen(false);
         if (action) {
-            //deleteUser(deleteId);
+            deleteEmployee(deleteId);
             enqueueSnackbar('Usuario eliminado exitosamente', { variant: 'success' });
         }
     }
@@ -103,25 +111,35 @@ export const useEmployee = () => {
         handleChange,
         setValues,
         resetForm,
+        setFieldValue
     } = useFormik({
         initialValues: {
+            rut: '',
             fullName: '',
+            email: '',
+            salary: 0,
+            hireDate: '',
+            city: '',
+            address: '',
+            type: ''
+
         },
-        onSubmit: ({ fullName }, { resetForm }) => {
-            //createUser({ userName, fullName, email, avatar, password });
-            console.log(fullName)
+        onSubmit: ({ rut, fullName, email, salary, hireDate, city, address, type }, { resetForm }) => {
+            //createEmployee({ rut, fullName, email, salary, hireDate, city, address, type });
+            console.log(rut, fullName, email, salary, hireDate, city, address, type)
+            console.log("HOLA")
             enqueueSnackbar('Usuario creado exitosamente', { variant: 'success' });
             resetForm();
         },
         validationSchema: Yup.object({
-            rut: Yup.string().min(11).max(12, 'Debe de tener minimo 11  y maximo 11 caracteres').required('Requerido'),
+            rut: Yup.string().min(9).max(11, 'Debe de tener minimo 11  y maximo 11 caracteres').required('Requerido'),
             fullName: Yup.string().min(10).max(30, 'Debe de tener minimo 10  y maximo 30 caracteres').required('Requerido'),
-            email: Yup.string().min(10).max(30, 'Debe de tener minimo 10  y maximo 30 caracteres').required('Requerido'),
+            email: Yup.string().email('debe ser un email valido').required('Requerido'),
             salary: Yup.number().min(11).required('Requerido'),
             hireDate: Yup.string().min(10).max(30, 'Debe de tener minimo 10  y maximo 30 caracteres').required('Requerido'),
             city: Yup.string().min(10).max(30, 'Debe de tener minimo 10  y maximo 30 caracteres').required('Requerido'),
             address: Yup.string().min(10).max(50, 'Debe ingresar la dirección').required('Requerido'),
-            type: Yup.string().min(10).max(30, 'Debe de tener minimo 10  y maximo 30 caracteres').required('Requerido'),
+            type: Yup.string().required('Requerido'),
         })
     });
 
@@ -157,6 +175,7 @@ export const useEmployee = () => {
         handleActive,
         handleDelete,
         onSetCreateModal,
+        setFieldValue,
         onClose
 
     }

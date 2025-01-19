@@ -37,6 +37,7 @@ export const EmployeePage = () => {
         handleActive,
         handleDelete,
         onSetCreateModal,
+        setFieldValue,
         onClose
     } = useEmployee();
 
@@ -87,6 +88,7 @@ export const EmployeePage = () => {
                     hiddeButton={hiddeButton}
                     saveUpdate={saveUpdate}
                     cancelUpdate={cancelUpdate}
+                    setFieldValue={setFieldValue}
                 />
             </CreateModal>
 
