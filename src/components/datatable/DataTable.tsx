@@ -7,7 +7,10 @@ import {
     Table,
     TableCell,
     TableRow,
+    makeStyles,
 } from '@mui/material';
+
+
 
 export const DataTable = (
     { count,
@@ -21,14 +24,24 @@ export const DataTable = (
     return (
         <TableContainer component={Paper}>
 
-            <Table sx={{ minWidth: 500 }} aria-label="simple table">
+            <Table
+                sx={{
+                    '& .MuiTableCell-sizeMedium': {
+                        padding: '5px 10px',
+                    },
+
+                }}
+                size="small"
+                aria-label="simple table">
                 {children}
 
                 <TableFooter>
                     <TableRow>
-                        <TableCell>
+                        <TableCell >
                             <TablePagination
-                                sx={{ display: "flex" }}
+                                sx={{
+                                    display: "flex",
+                                }}
                                 component="div"
                                 count={count}
                                 page={page}
