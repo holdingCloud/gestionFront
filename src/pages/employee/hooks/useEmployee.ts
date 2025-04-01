@@ -139,7 +139,7 @@ export const useEmployee = () => {
             hireDate: Yup.string().min(10).max(30, 'Debe de tener minimo 10  y maximo 30 caracteres').required('Requerido'),
             city: Yup.string().min(10).max(30, 'Debe de tener minimo 10  y maximo 30 caracteres').required('Requerido'),
             address: Yup.string().min(10).max(50, 'Debe ingresar la dirección').required('Requerido'),
-            type: Yup.string().required('Requerido'),
+            type: Yup.string().required('Seleccione una opción'),
         })
     });
 
