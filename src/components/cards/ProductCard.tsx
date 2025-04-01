@@ -16,7 +16,6 @@ import { gestionApi } from "../../api/gestion.api";
 import { useEffect, useState } from "react";
 
 interface Props {
-    id: number,
     name: string,
     description: string,
     quantity: number,
@@ -27,7 +26,7 @@ interface Props {
 
 
 
-export const ProductCard = ({ id, name, description, img, quantity, code, handleOpen }: Props) => {
+export const ProductCard = ({ name, description, img, quantity, code, handleOpen }: Props) => {
 
     const [productImage, setProductImage] = useState(`img`);
 

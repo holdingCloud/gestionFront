@@ -15,10 +15,10 @@ export interface EmployeeState {
 
 }
 
-const storeApi: StateCreator<EmployeeState, [["zustand/devtools", never], ["zustand/immer", never]]> = (set, get) => ({
+const storeApi: StateCreator<EmployeeState, [["zustand/devtools", never], ["zustand/immer", never]]> = (set) => ({
     employees: [],
     count: 0,
-    getEmployees: async (skip, take, filter) => {
+    getEmployees: async (skip, take) => {
         try {
             const { employees, count } = await EmployeeService.getEmployees({ skip, take });
             set({ employees, count });
