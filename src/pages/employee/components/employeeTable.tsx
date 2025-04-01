@@ -3,13 +3,14 @@ import { Grid, TableHead, TableRow, TableCell, TableBody, Tooltip, ButtonGroup, 
 import { DataTable } from "../../../components"
 
 
-export const UserTable = ({
+
+export const EmployeeTable = ({
     count,
     page,
     rowsPerPage,
     handleChangePage,
     handleChangeRowsPerPage,
-    users,
+    data,
     handleActive,
     handleUpdate,
     handleDelete
@@ -41,35 +42,50 @@ export const UserTable = ({
                     handleChangeRowsPerPage={handleChangeRowsPerPage} >
                     <TableHead>
                         <TableRow>
-                            <TableCell>Usuario</TableCell>
-                            <TableCell >Nombre completo</TableCell>
+                            <TableCell
+                                component="th"
+                                scope="row">RUT</TableCell>
+                            <TableCell>Nombre completo</TableCell>
                             <TableCell >Email</TableCell>
-                            <TableCell >Avatar</TableCell>
+                            <TableCell >Ciudad</TableCell>
+                            <TableCell >Dirección</TableCell>
+                            <TableCell >Fecha Contrato</TableCell>
+                            <TableCell >Tipo empleado</TableCell>
+                            <TableCell >Sueldo</TableCell>
                             <TableCell >Estado</TableCell>
                             <TableCell >Acciones</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {(users?.length != 0) ? users?.map((row: any) => (
+                        {(data?.length != 0) ? data?.map((row: any) => (
                             <TableRow
                                 key={row.id}
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                             >
-                                <TableCell component="th" scope="row">
-                                    {row.userName}
+                                <TableCell
+
+                                    component="th"
+                                    scope="row">
+                                    {row.rut}
                                 </TableCell>
-                                <TableCell >{row.fullName}</TableCell>
+                                <TableCell >{row.fullname}</TableCell>
                                 <TableCell >{row.email}</TableCell>
-                                <TableCell >{row.avatar}</TableCell>
-                                <TableCell >{
-                                    row.isActive ?
-                                        (<Tooltip onClick={() => handleActive(row.id, false)} title="ACTIVO" sx={{ cursor: "pointer" }}>
-                                            <VerifiedUserOutlined color='success' />
-                                        </Tooltip>)
-                                        : (<Tooltip onClick={() => handleActive(row.id, true)} title="INACTIVO" sx={{ cursor: "pointer" }} >
-                                            <GppBadOutlined color='error' />
-                                        </Tooltip>)
-                                }</TableCell>
+                                <TableCell >{row.city}</TableCell>
+                                <TableCell >{row.address}</TableCell>
+                                <TableCell >{row.hireDate}</TableCell>
+                                <TableCell >{row.type}</TableCell>
+                                <TableCell >{row.salary}</TableCell>
+                                <TableCell sx={{
+                                    textAlign: "center"
+                                }}>{
+                                        row.available ?
+                                            (<Tooltip onClick={() => handleActive(row.id, false)} title="ACTIVO" sx={{ cursor: "pointer" }}>
+                                                <VerifiedUserOutlined color='success' />
+                                            </Tooltip>)
+                                            : (<Tooltip onClick={() => handleActive(row.id, true)} title="INACTIVO" sx={{ cursor: "pointer" }} >
+                                                <GppBadOutlined color='error' />
+                                            </Tooltip>)
+                                    }</TableCell>
                                 <TableCell
                                 ><ButtonGroup
                                     disableElevation
