@@ -1,7 +1,7 @@
 import { devtools } from "zustand/middleware";
 
 import { StateCreator, create } from "zustand";
-import { ProductBody, Products, Users, userBody } from "../../interfaces";
+import { ProductBody, Products, Users } from "../../interfaces";
 import { immer } from "zustand/middleware/immer";
 import { ProductService } from "../../services/product.service";
 
@@ -15,7 +15,7 @@ export interface ProductState {
 
 }
 
-const storeApi: StateCreator<ProductState, [["zustand/devtools", never], ["zustand/immer", never]]> = (set, get) => ({
+const storeApi: StateCreator<ProductState, [["zustand/devtools", never], ["zustand/immer", never]]> = (set) => ({
     products: [],
     count: 0,
     getProducts: async (skip, take) => {
@@ -39,7 +39,7 @@ const storeApi: StateCreator<ProductState, [["zustand/devtools", never], ["zusta
             console.log(error);
         }
     },
-    deleteProduct: async (id) => {
+    deleteProduct: async () => {
         try {
             // const { success } = await UserService.deleleUser(id);
             //
@@ -52,7 +52,7 @@ const storeApi: StateCreator<ProductState, [["zustand/devtools", never], ["zusta
             console.log(error);
         }
     },
-    updateProduct: async (userData) => {
+    updateProduct: async () => {
 
         //  const { id, ...user } = userData;
 
