@@ -1,10 +1,10 @@
-FROM arm32v6/node:20.10.0-alpine as dev-deps
+FROM node:21-alpine as dev-deps
 WORKDIR /app
 COPY package.json package.json
-RUN npm install --frozen-lockfile
+RUN npm install
 
 
-FROM arm32v6/node:20.10.0-alpine as builder
+FROM node:21-alpine as builder
 WORKDIR /app
 COPY --from=dev-deps /app/node_modules ./node_modules
 COPY . .
