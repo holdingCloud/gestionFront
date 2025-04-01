@@ -24,10 +24,6 @@ export const EmployeeForm = ({
 
     const currencies = [
         {
-            value: 0,
-            label: 'Seleccione una opción',
-        },
-        {
             value: 1,
             label: 'ADMINISTRADOR',
         },
@@ -125,7 +121,10 @@ export const EmployeeForm = ({
                                     setFieldValue("hireDate", newValue?.format('DD-MM-YYYY'));
                                 }
                             }
+
+
                         />
+
                     </LocalizationProvider>
 
                     <TextField
@@ -158,7 +157,6 @@ export const EmployeeForm = ({
                         select
                         label="Función"
                         name="type"
-                        defaultValue="0"
                         size="small"
                         value={values.type}
                         onChange={handleChange}
@@ -167,7 +165,7 @@ export const EmployeeForm = ({
                         helperText={touched.type && errors.type}
                     >
                         {currencies.map((option) => (
-                            <MenuItem key={option.value} value={option.value}>
+                            <MenuItem key={option.value} value={option.label}>
                                 {option.label}
                             </MenuItem>
                         ))}
