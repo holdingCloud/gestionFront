@@ -1,10 +1,10 @@
-FROM node:alpine3.21 AS dev-deps
+FROM node:20.11.1-alpine AS dev-deps
 WORKDIR /app
 COPY package.json package.json
 RUN npm install
 
 
-FROM node:alpine3.21 AS builder
+FROM node:20.11.1-alpine AS builder
 WORKDIR /app
 COPY --from=dev-deps /app/node_modules ./node_modules
 COPY . .
@@ -12,7 +12,7 @@ COPY . .
 RUN npm run build
 
 
-FROM nginx:latest AS prod
+FROM nginx:1.25.3-alpine AS prod
 EXPOSE 80
 COPY --from=builder /app/dist /usr/share/nginx/html
 RUN rm /etc/nginx/conf.d/default.conf
