@@ -12,7 +12,7 @@ COPY . .
 RUN npm run build
 
 
-FROM nginx:1.25.3-alpine AS prod
+FROM nginx:stable-alpine3.21-perl AS prod
 EXPOSE 80
 COPY --from=builder /app/dist /usr/share/nginx/html
 RUN rm /etc/nginx/conf.d/default.conf
