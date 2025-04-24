@@ -12,7 +12,7 @@ COPY . .
 RUN npm run build
 
 
-FROM nginx:latest AS prod
+FROM nginx:stable-perl AS prod
 EXPOSE 80
 COPY --from=builder /app/dist /usr/share/nginx/html
 RUN rm /etc/nginx/conf.d/default.conf
