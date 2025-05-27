@@ -7,8 +7,8 @@ services:
     ports:
       - "8088:80"
     networks:
-      - gestionback_gsysnet
+      - gsysnet
 
 networks:
-  gestionback_gsysnet:
+  gsysnet:
     external: true

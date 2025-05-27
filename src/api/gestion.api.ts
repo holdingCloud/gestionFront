@@ -3,7 +3,7 @@ import { useAuthStore } from "../store/auth/auth.store";
 
 
 const gestionApi = axios.create({
-    baseURL: 'http://gestion_backend:3000/api'
+    baseURL: 'http://localhost:3000/api'
 });
 
 gestionApi.interceptors.request.use(
@@ -18,4 +18,4 @@ gestionApi.interceptors.request.use(
 
 export {
     gestionApi
-}
+} 
