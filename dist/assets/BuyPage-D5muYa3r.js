@@ -1,1 +1,0 @@
-import{j as r,A as s,G as o}from"./index-CFFZuX_R.js";import{U as t}from"./UrlBreadcrumbs-B4QHP1vT.js";const d=()=>r.jsxs(s,{maxWidth:!1,disableGutters:!0,children:[r.jsx(t,{}),r.jsx(o,{sx:{bgcolor:"#FFF",borderRadius:2,boxShadow:10,borderColor:"#ccc",marginBottom:2,padding:5},item:!0,xs:12,sm:12,md:12,lg:12})]});export{d as BuyPage,d as default};
