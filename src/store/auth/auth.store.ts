@@ -5,7 +5,8 @@ import { StateCreator, create } from "zustand";
 
 export interface AuthState {
     status: AuthStatus;
-    token?: string;
+    accessToken?: string;
+    refreshToken?: string;
     user?: User;
     error: boolean;
     loginUser: (email: string, password: string) => Promise<void>;
@@ -22,22 +23,22 @@ const storeApi: StateCreator<AuthState> = (set, get) => ({
     error: false,
     loginUser: async (email: string, password: string) => {
         try {
-            const { token, user } = await AuthService.login(email, password);
-            set({ status: 'authorized', token, user })
+            const { accessToken, refreshToken, user } = await AuthService.login(email, password);
+            set({ status: 'authorized', accessToken, refreshToken, user });
         } catch (error) {
-            set({ status: 'unauthorized', token: undefined, user: undefined, error: true });
+            set({ status: 'unauthorized', accessToken: undefined, refreshToken: undefined, user: undefined, error: true });
         }
     },
     checkAuthStatus: async () => {
         try {
-            const { token } = await AuthService.checkStatus();
-            set({ status: 'authorized', token });
+            const { accessToken, refreshToken } = await AuthService.checkStatus();
+            set({ status: 'authorized', accessToken, refreshToken });
         } catch (error) {
-            set({ status: 'unauthorized', token: undefined, user: undefined });
+            set({ status: 'unauthorized', accessToken: undefined, refreshToken: undefined, user: undefined });
         }
     },
     logoutUser: () => {
-        set({ status: 'unauthorized', token: undefined, user: undefined });
+        set({ status: 'unauthorized', accessToken: undefined, refreshToken: undefined, user: undefined });
     },
     getUser: () => {
         return get().user;
@@ -49,11 +50,11 @@ const storeApi: StateCreator<AuthState> = (set, get) => ({
         const id = get().user?.id;
         if (id) {
             try {
-                const { token } = await AuthService.reNewSession(id);
-                console.log(token)
-                set({ status: 'authorized', token });
+                const { accessToken, refreshToken } = await AuthService.reNewSession(id);
+                console.log(accessToken, refreshToken)
+                set({ status: 'authorized', accessToken, refreshToken });
             } catch (error) {
-                set({ status: 'unauthorized', token: undefined, user: undefined });
+                set({ status: 'unauthorized', accessToken: undefined, refreshToken: undefined, user: undefined });
             }
         }
 

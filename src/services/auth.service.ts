@@ -4,7 +4,8 @@ import { User } from "../interfaces";
 
 export interface LoginResponse {
     user: User;
-    token: string;
+    accessToken: string;
+    refreshToken: string;
 }
 
 
@@ -27,7 +28,7 @@ export class AuthService {
 
     static checkStatus = async () => {
         try {
-            const { data } = await gestionApi.get<{ token: string }>('/auth/refreshToken');
+            const { data } = await gestionApi.get<{ accessToken: string, refreshToken: string }>('/auth/refreshToken');
             return data;
 
         } catch (error) {
@@ -42,7 +43,7 @@ export class AuthService {
 
         try {
 
-            const { data } = await gestionApi.get<{ token: string }>(`/auth/keepSession/${id}`);
+            const { data } = await gestionApi.get<{ accessToken: string, refreshToken: string }>(`/auth/keepSession/${id}`);
             return data;
         } catch (error) {
             throw new Error('Unable to login');
