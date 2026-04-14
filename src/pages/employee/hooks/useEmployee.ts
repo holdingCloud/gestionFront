@@ -72,10 +72,9 @@ export const useEmployee = () => {
         setValues({ ...data });
     }
 
-    const handleActive = (id: number, status: boolean) => {
+    const handleActive = (_id: number, _status: boolean) => {
         //changeStatus(id, status);
         enqueueSnackbar('El estado usuario actualizado exitosamente', { variant: 'success' });
-        console.log(id, status);
         setTimeout(() => {
             //getUsers(skip, rowsPerPage, filter);
         }, 1000)

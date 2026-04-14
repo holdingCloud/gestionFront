@@ -8,7 +8,7 @@ export const UrlBreadCrumbs = () => {
 
     const back = location.pathname.split("/");
 
-    let currentPath = back.at(2);
+    let currentPath = back[2];
 
     if (currentPath) {
 
@@ -23,7 +23,7 @@ export const UrlBreadCrumbs = () => {
         }}>
 
             <Link
-                color="inherit" to={`/${back.at(1)}`}
+                color="inherit" to={`/${back[1]}`}
             >
                 Dashboard
             </Link>
