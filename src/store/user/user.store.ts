@@ -15,7 +15,7 @@ export interface UserState {
 
 }
 
-const storeApi: StateCreator<UserState, [["zustand/devtools", never], ["zustand/immer", never]]> = (set, get) => ({
+const storeApi: StateCreator<UserState, [["zustand/devtools", never], ["zustand/immer", never]]> = (set) => ({
     users: [],
     count: 0,
     getUsers: async (skip, take, filter) => {

@@ -10,8 +10,6 @@ export const useEmployee = () => {
     const count = useEmployeeStore(state => state.count);
     const getEmployees = useEmployeeStore(state => state.getEmployees);
     const deleteEmployee = useEmployeeStore(state => state.deleteEmployee);
-    const createEmployee = useEmployeeStore(state => state.createEmployee);
-    const updateEmployee = useEmployeeStore(state => state.updateEmployee);
 
     const { enqueueSnackbar } = useSnackbar();
 
@@ -52,10 +50,10 @@ export const useEmployee = () => {
 
     const saveUpdate = () => {
 
-        const dataUpdate = {
-            id: deleteId,
-            ...values
-        }
+        /*  const dataUpdate = {
+              id: deleteId,
+              ...values
+          }*/
 
         //updateEmployee(dataUpdate);
         enqueueSnackbar('Usuario actualizado exitosamente', { variant: 'success' });
@@ -77,7 +75,7 @@ export const useEmployee = () => {
     const handleActive = (id: number, status: boolean) => {
         //changeStatus(id, status);
         enqueueSnackbar('El estado usuario actualizado exitosamente', { variant: 'success' });
-
+        console.log(id, status);
         setTimeout(() => {
             //getUsers(skip, rowsPerPage, filter);
         }, 1000)

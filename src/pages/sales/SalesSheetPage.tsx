@@ -1,4 +1,4 @@
-import { Autocomplete, Button, Container, Grid, IconButton, MenuItem, SelectChangeEvent, TextField } from "@mui/material";
+import { Autocomplete, Button, Container, Grid, IconButton, MenuItem, TextField } from "@mui/material";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -46,6 +46,7 @@ export const salesSheet = () => {
     }
 
     const onClose = (action: boolean) => {
+        console.log(action)
         setOpen(false);
 
     }

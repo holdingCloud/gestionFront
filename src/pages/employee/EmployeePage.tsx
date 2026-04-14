@@ -23,7 +23,6 @@ export const EmployeePage = () => {
         touched,
         hiddeButton,
         //Methods
-        getEmployees,
         saveUpdate,
         cancelUpdate,
         createModal,

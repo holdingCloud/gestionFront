@@ -8,9 +8,11 @@ const gestionApi = axios.create({
 
 gestionApi.interceptors.request.use(
     (config) => {
-        const token = useAuthStore.getState().token;
+        const token = useAuthStore.getState().accessToken;  
+        const refreshToken = useAuthStore.getState().refreshToken;
         if (token) {
             config.headers['Authorization'] = `Bearer ${token}`;
+            config.headers['x-refresh-token'] = refreshToken;
         }
         return config;
     }
@@ -18,4 +20,4 @@ gestionApi.interceptors.request.use(
 
 export {
     gestionApi
-}
+} 
