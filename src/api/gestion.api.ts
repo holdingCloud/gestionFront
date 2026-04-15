@@ -6,7 +6,6 @@ const gestionApi = axios.create({
     baseURL: import.meta.env.VITE_GESTION_API_URL
 });
 
-console.log('[API] Base URL:', import.meta.env.VITE_GESTION_API_URL);
 
 gestionApi.interceptors.request.use(
     (config) => {

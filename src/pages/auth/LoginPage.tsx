@@ -57,6 +57,8 @@ export function LoginPage() {
 
         },
         onSubmit: async ({ email, password }, { resetForm }) => {
+            console.log('Login attempt with email:', email);
+            console.log('[API] Base URL:', import.meta.env.VITE_GESTION_API_URL);
             await loginUser(email, password);
             resetForm();
         },
