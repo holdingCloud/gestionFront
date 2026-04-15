@@ -1,14 +1,14 @@
 import { devtools } from "zustand/middleware";
 import { UserService } from "../../services/user.service";
 import { StateCreator, create } from "zustand";
-import { Users, userBody } from "../../interfaces";
+import { Users, UserBody } from "../../interfaces";
 import { immer } from "zustand/middleware/immer";
 
 export interface UserState {
     users: Users[];
     count: number;
     getUsers: (page: number, limit: number, { }: any) => Promise<void>;
-    createUser: (user: userBody) => Promise<void>;
+    createUser: (user: UserBody) => Promise<void>;
     deleteUser: (id: number) => void;
     changeStatus: (id: number, status: boolean) => void;
     updateUser: (user: Users) => void;
@@ -20,8 +20,8 @@ const storeApi: StateCreator<UserState, [["zustand/devtools", never], ["zustand/
     count: 0,
     getUsers: async (page, limit, filter) => {
         try {
-            const { users, count } = await UserService.getUsers({ page, limit }, filter);
-            set({ users, count });
+            const { data, count } = await UserService.getUsers({ page, limit }, filter);
+            set({ users: data, count });
         } catch (error) {
             set({ users: undefined, count: 0 })
 
@@ -29,7 +29,7 @@ const storeApi: StateCreator<UserState, [["zustand/devtools", never], ["zustand/
     },
     createUser: async (user) => {
         try {
-            const data = await UserService.createrUser(user);
+            const data = await UserService.createUser(user);
             set(state => ({
                 users: [data, ...state.users],
                 count: state.count + 1
@@ -40,7 +40,7 @@ const storeApi: StateCreator<UserState, [["zustand/devtools", never], ["zustand/
     },
     deleteUser: async (id) => {
         try {
-            const { success } = await UserService.deleleUser(id);
+            const { success } = await UserService.deleteUser(id);
 
             if (success) {
                 set(state => ({
@@ -68,7 +68,7 @@ const storeApi: StateCreator<UserState, [["zustand/devtools", never], ["zustand/
         const { id, ...user } = userData;
 
         try {
-            const data = await UserService.updateUser(id, user);
+            const data = await UserService.updateUser(id, user as any);
 
             console.log(data);
         } catch (error) {
