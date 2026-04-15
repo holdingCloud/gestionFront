@@ -7,7 +7,7 @@ import { EmployeeService } from "../../services/employee.service";
 export interface EmployeeState {
     employees: Employees[];
     count: number;
-    getEmployees: (skip: number, take: number, { }: any) => Promise<void>;
+    getEmployees: (page: number, limit: number, { }: any) => Promise<void>;
     createEmployee: (employee: employeeBody) => Promise<void>;
     deleteEmployee: (id: number) => void;
     changeStatus: (id: number, status: boolean) => void;
@@ -18,9 +18,9 @@ export interface EmployeeState {
 const storeApi: StateCreator<EmployeeState, [["zustand/devtools", never], ["zustand/immer", never]]> = (set) => ({
     employees: [],
     count: 0,
-    getEmployees: async (skip, take) => {
+    getEmployees: async (page, limit) => {
         try {
-            const { employees, count } = await EmployeeService.getEmployees({ skip, take });
+            const { employees, count } = await EmployeeService.getEmployees({ page, limit });
             set({ employees, count });
         } catch (error) {
             set({ employees: undefined, count: 0 })

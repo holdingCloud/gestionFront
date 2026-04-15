@@ -20,7 +20,6 @@ export const useEmployee = () => {
     const [page, setPage] = useState(0);
     const [deleteId, setDeleteId] = useState<number>(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [skip, setSkip] = useState(0);
 
     const handleChangePage = (
         event: MouseEvent<HTMLButtonElement> | null,
@@ -28,7 +27,6 @@ export const useEmployee = () => {
     ) => {
         event?.preventDefault();
         setPage(newPage);
-        setSkip(rowsPerPage * newPage);
     };
 
     const handleChangeRowsPerPage = (
@@ -40,7 +38,7 @@ export const useEmployee = () => {
 
     const handleFilter = (fullname: string, email: string) => {
         setFilter({ fullname, email });
-        setSkip(0);
+        setPage(0);
         setRowsPerPage(0);
     }
 
@@ -60,7 +58,7 @@ export const useEmployee = () => {
         resetForm();
 
         setTimeout(() => {
-            getEmployees(skip, rowsPerPage, {});
+            getEmployees(page, rowsPerPage, {});
         }, 1000)
 
     }
@@ -143,8 +141,8 @@ export const useEmployee = () => {
 
 
     useEffect(() => {
-        getEmployees(skip, rowsPerPage, filter);
-    }, [skip, rowsPerPage, filter]);
+        getEmployees(page, rowsPerPage, filter);
+    }, [page, rowsPerPage, filter]);
 
     return {
         //Properties

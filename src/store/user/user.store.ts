@@ -7,7 +7,7 @@ import { immer } from "zustand/middleware/immer";
 export interface UserState {
     users: Users[];
     count: number;
-    getUsers: (skip: number, take: number, { }: any) => Promise<void>;
+    getUsers: (page: number, limit: number, { }: any) => Promise<void>;
     createUser: (user: userBody) => Promise<void>;
     deleteUser: (id: number) => void;
     changeStatus: (id: number, status: boolean) => void;
@@ -18,9 +18,9 @@ export interface UserState {
 const storeApi: StateCreator<UserState, [["zustand/devtools", never], ["zustand/immer", never]]> = (set) => ({
     users: [],
     count: 0,
-    getUsers: async (skip, take, filter) => {
+    getUsers: async (page, limit, filter) => {
         try {
-            const { users, count } = await UserService.getUsers({ skip, take }, filter);
+            const { users, count } = await UserService.getUsers({ page, limit }, filter);
             set({ users, count });
         } catch (error) {
             set({ users: undefined, count: 0 })

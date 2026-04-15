@@ -6,14 +6,14 @@ import { UserResponse, Users, pagination, userBody, userFilter } from "../interf
 export class UserService {
 
 
-    static getUsers = async ({ skip, take }: pagination, { fullname, email }: userFilter): Promise<UserResponse> => {
+    static getUsers = async ({ page, limit }: pagination, { fullname, email }: userFilter): Promise<UserResponse> => {
 
         try {
 
 
             const queryParams = {
-                skip,
-                take,
+                page,
+                limit,
                 fullName: fullname,
                 email
             }

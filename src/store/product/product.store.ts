@@ -8,7 +8,7 @@ import { ProductService } from "../../services/product.service";
 export interface ProductState {
     products: Products[];
     count: number;
-    getProducts: (skip: number, take: number) => Promise<void>;
+    getProducts: (page: number, limit: number) => Promise<void>;
     createProduct: (product: ProductBody) => Promise<void>;
     deleteProduct: (id: number) => void;
     updateProduct: (user: Users) => void;
@@ -18,9 +18,9 @@ export interface ProductState {
 const storeApi: StateCreator<ProductState, [["zustand/devtools", never], ["zustand/immer", never]]> = (set) => ({
     products: [],
     count: 0,
-    getProducts: async (skip, take) => {
+    getProducts: async (page, limit) => {
         try {
-            const { products, count } = await ProductService.getProducts({ skip, take });
+            const { products, count } = await ProductService.getProducts({ page, limit });
             set({ products, count });
         } catch (error) {
             set({ products: undefined, count: 0 })

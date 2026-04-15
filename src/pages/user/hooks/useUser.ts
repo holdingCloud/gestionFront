@@ -22,7 +22,6 @@ export const useUser = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [skip, setSkip] = useState(0);
     const [createModal, setCreateModal] = useState(false);
     const [open, setOpen] = useState<boolean>(false);
     const [openDialog, setOpenDialog] = useState(false);
@@ -41,7 +40,6 @@ export const useUser = () => {
     ) => {
         event?.preventDefault();
         setPage(newPage);
-        setSkip(rowsPerPage * newPage);
     };
 
     const handleChangeRowsPerPage = (
@@ -90,7 +88,7 @@ export const useUser = () => {
         resetForm();
 
         setTimeout(() => {
-            getUsers(skip, rowsPerPage, {});
+            getUsers(page, rowsPerPage, {});
         }, 1000)
 
     }
@@ -108,14 +106,14 @@ export const useUser = () => {
         enqueueSnackbar('El estado usuario actualizado exitosamente', { variant: 'success' });
 
         setTimeout(() => {
-            getUsers(skip, rowsPerPage, filter);
+            getUsers(page, rowsPerPage, filter);
         }, 1000)
     }
 
 
     const handleFilter = (fullname: string, email: string) => {
         setFilter({ fullname, email });
-        setSkip(0);
+        setPage(0);
         setRowsPerPage(10);
     }
 
@@ -155,7 +153,7 @@ export const useUser = () => {
 
 
     useEffect(() => {
-        getUsers(skip, rowsPerPage, filter);
+        getUsers(page, rowsPerPage, filter);
         checkAuthStatus();
 
     }, [page, rowsPerPage, filter]);
