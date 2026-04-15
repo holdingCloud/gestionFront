@@ -28,7 +28,7 @@ export class AuthService {
 
     static checkStatus = async () => {
         try {
-            const { data } = await gestionApi.get<{ accessToken: string, refreshToken: string }>('/auth/refresh');
+            const { data } = await gestionApi.post<{ accessToken: string, refreshToken: string }>('/auth/refresh');
             return data;
 
         } catch (error) {
