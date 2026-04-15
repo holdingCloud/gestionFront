@@ -18,7 +18,7 @@ export class UserService {
                 email
             }
 
-            const { data } = await gestionApi.get<UserResponse>(`/user`, {
+            const { data } = await gestionApi.get<UserResponse>(`/users`, {
                 params: queryParams
             });
             return data;
@@ -36,7 +36,7 @@ export class UserService {
     static getUser = async (id: number): Promise<UserResponse> => {
 
         try {
-            const { data } = await gestionApi.get<UserResponse>(`/user/${id}`);
+            const { data } = await gestionApi.get<UserResponse>(`/users/${id}`);
 
             return data;
 
@@ -53,7 +53,7 @@ export class UserService {
     static createrUser = async (user: userBody): Promise<Users> => {
 
         try {
-            const { data } = await gestionApi.post<Users>(`/user/`, user);
+            const { data } = await gestionApi.post<Users>(`/users/`, user);
 
             return data;
 
@@ -70,7 +70,7 @@ export class UserService {
     static updateUser = async (id: number, user: userBody): Promise<Users> => {
 
         try {
-            const { data } = await gestionApi.put<Users>(`/user/${id}`, user);
+            const { data } = await gestionApi.put<Users>(`/users/${id}`, user);
 
             return data;
 
@@ -86,7 +86,7 @@ export class UserService {
 
     static changeStatus = async (id: number, status: boolean): Promise<Users> => {
         try {
-            const { data } = await gestionApi.patch<Users>(`/user/${id}`, { status });
+            const { data } = await gestionApi.patch<Users>(`/users/${id}`, { status });
 
             return data;
 
@@ -103,7 +103,7 @@ export class UserService {
     static deleleUser = async (id: number): Promise<{ message: string, success: boolean }> => {
 
         try {
-            const { data } = await gestionApi.delete<{ message: string, success: boolean }>(`/user/${id}`);
+            const { data } = await gestionApi.delete<{ message: string, success: boolean }>(`/users/${id}`);
 
             return data;
 
