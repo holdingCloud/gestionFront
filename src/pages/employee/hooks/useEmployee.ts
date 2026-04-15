@@ -17,7 +17,7 @@ export const useEmployee = () => {
     const [hiddeButton, setHiddeButton] = useState(true);
     const [open, setOpen] = useState<boolean>(false);
     const [filter, setFilter] = useState<{ fullname: string, email: string }>({ fullname: "", email: "" });
-    const [page, setPage] = useState(0);
+    const [page, setPage] = useState(1);
     const [deleteId, setDeleteId] = useState<number>(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -33,12 +33,12 @@ export const useEmployee = () => {
         event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     ) => {
         setRowsPerPage(parseInt(event.target.value, 10));
-        setPage(0);
+        setPage(1);
     };
 
     const handleFilter = (fullname: string, email: string) => {
         setFilter({ fullname, email });
-        setPage(0);
+        setPage(1);
         setRowsPerPage(0);
     }
 

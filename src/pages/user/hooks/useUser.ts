@@ -20,7 +20,7 @@ export const useUser = () => {
     const { enqueueSnackbar } = useSnackbar();
 
     const [showPassword, setShowPassword] = useState(false);
-    const [page, setPage] = useState(0);
+    const [page, setPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [createModal, setCreateModal] = useState(false);
     const [open, setOpen] = useState<boolean>(false);
@@ -46,7 +46,7 @@ export const useUser = () => {
         event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     ) => {
         setRowsPerPage(parseInt(event.target.value, 10));
-        setPage(0);
+        setPage(1);
     };
 
     const onCloseDialog = () => {
@@ -113,7 +113,7 @@ export const useUser = () => {
 
     const handleFilter = (fullname: string, email: string) => {
         setFilter({ fullname, email });
-        setPage(0);
+        setPage(1);
         setRowsPerPage(10);
     }
 
