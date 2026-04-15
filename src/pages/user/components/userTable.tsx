@@ -41,10 +41,9 @@ export const UserTable = ({
                     handleChangeRowsPerPage={handleChangeRowsPerPage} >
                     <TableHead>
                         <TableRow>
-                            <TableCell>Usuario</TableCell>
-                            <TableCell >Nombre completo</TableCell>
+                            <TableCell>Nombre </TableCell>
                             <TableCell >Email</TableCell>
-                            <TableCell >Avatar</TableCell>
+                            <TableCell >ROL</TableCell>
                             <TableCell >Estado</TableCell>
                             <TableCell >Acciones</TableCell>
                         </TableRow>
@@ -56,11 +55,10 @@ export const UserTable = ({
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                             >
                                 <TableCell component="th" scope="row">
-                                    {row.userName}
+                                    {row.fullName}
                                 </TableCell>
-                                <TableCell >{row.fullName}</TableCell>
                                 <TableCell >{row.email}</TableCell>
-                                <TableCell >{row.avatar}</TableCell>
+                                <TableCell >{row.role}</TableCell>
                                 <TableCell >{
                                     row.isActive ?
                                         (<Tooltip onClick={() => handleActive(row.id, false)} title="ACTIVO" sx={{ cursor: "pointer" }}>
