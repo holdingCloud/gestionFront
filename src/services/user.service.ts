@@ -1,12 +1,12 @@
 import { AxiosError } from "axios";
 import { gestionApi } from "../api/gestion.api";
-import { UserResponse, Users, pagination, userBody, userFilter } from "../interfaces";
+import { UserResponse, Users, pagination, UserBody, UserFilter } from "../interfaces";
 
 
 export class UserService {
 
 
-    static getUsers = async ({ page, limit }: pagination, { fullname, email }: userFilter): Promise<UserResponse> => {
+    static getUsers = async ({ page, limit }: pagination, { fullName, email }: UserFilter): Promise<UserResponse> => {
 
         try {
 
@@ -14,7 +14,7 @@ export class UserService {
             const queryParams = {
                 page,
                 limit,
-                fullName: fullname,
+                fullName,
                 email
             }
 
@@ -29,7 +29,7 @@ export class UserService {
                 throw new Error(error.response?.data);
             }
             console.log(error);
-            throw new Error('Unable get users');
+            throw new Error('Unable to get users');
         }
     }
 
@@ -46,11 +46,11 @@ export class UserService {
                 throw new Error(error.response?.data);
             }
             console.log(error);
-            throw new Error('Unable to login');
+            throw new Error('Unable to get user');
         }
     }
 
-    static createrUser = async (user: userBody): Promise<Users> => {
+    static createUser = async (user: UserBody): Promise<Users> => {
 
         try {
             const { data } = await gestionApi.post<Users>(`/users/`, user);
@@ -63,11 +63,11 @@ export class UserService {
                 throw new Error(error.response?.data);
             }
             console.log(error);
-            throw new Error('Unable to login');
+            throw new Error('Unable to create user');
         }
     }
 
-    static updateUser = async (id: number, user: userBody): Promise<Users> => {
+    static updateUser = async (id: number, user: UserBody): Promise<Users> => {
 
         try {
             const { data } = await gestionApi.put<Users>(`/users/${id}`, user);
@@ -80,7 +80,7 @@ export class UserService {
                 throw new Error(error.response?.data);
             }
             console.log(error);
-            throw new Error('Unable to login');
+            throw new Error('Unable to update user');
         }
     }
 
@@ -96,11 +96,11 @@ export class UserService {
                 throw new Error(error.response?.data);
             }
             console.log(error);
-            throw new Error('Unable to login');
+            throw new Error('Unable to change user status');
         }
     }
 
-    static deleleUser = async (id: number): Promise<{ message: string, success: boolean }> => {
+    static deleteUser = async (id: number): Promise<{ message: string, success: boolean }> => {
 
         try {
             const { data } = await gestionApi.delete<{ message: string, success: boolean }>(`/users/${id}`);
@@ -113,7 +113,7 @@ export class UserService {
                 throw new Error(error.response?.data);
             }
             console.log(error);
-            throw new Error('Unable to login');
+            throw new Error('Unable to delete user');
         }
     }
 }

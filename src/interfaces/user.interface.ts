@@ -1,6 +1,6 @@
 export interface UserResponse {
-    users: Users[];
-    count: number;
+    data: Users[];
+    count?: number;
 }
 
 export interface Users {
@@ -8,12 +8,11 @@ export interface Users {
     userName: string;
     fullName: string;
     email: string;
-    password: string;
     avatar: string;
     isActive: boolean;
 }
 
-export interface userBody {
+export interface UserBody {
     userName: string;
     fullName: string;
     email: string;
@@ -21,7 +20,7 @@ export interface userBody {
     avatar: string;
 }
 
-export interface userFilter {
-    fullname: string;
+export interface UserFilter {
+    fullName: string;
     email: string;
 }
