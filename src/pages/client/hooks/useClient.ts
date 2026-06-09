@@ -61,6 +61,7 @@ export const useClient = () => {
             phone: data.phone ?? '',
             city: data.city ?? '',
             address: data.address ?? '',
+            frequency: data.frequency ?? '',
         });
     };
 

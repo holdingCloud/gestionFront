@@ -1,6 +1,6 @@
 import { EditOutlined, DeleteForeverOutlined } from "@mui/icons-material"
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
-import { Box, Grid, TableHead, TableRow, TableCell, TableBody, Tooltip, ButtonGroup, Button, Chip, IconButton, Typography } from "@mui/material"
+import { Grid, TableHead, TableRow, TableCell, TableBody, Tooltip, ButtonGroup, Button, Chip, IconButton, Typography } from "@mui/material"
 import { DataTable } from "../../../components"
 
 const statusColor: Record<string, 'warning' | 'error' | 'success' | 'default'> = {
