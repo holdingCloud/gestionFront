@@ -20,7 +20,7 @@ export const EmployeeTable = ({
     return (
         <Grid
             sx={{
-                bgcolor: '#FFF',
+                bgcolor: 'background.paper',
                 borderRadius: 2,
                 boxShadow: 10,
                 borderColor: '#ccc',

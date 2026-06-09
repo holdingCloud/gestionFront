@@ -117,7 +117,7 @@ export const InventoryPage = () => {
 
             <Grid
                 sx={{
-                    bgcolor: '#FFF',
+                    bgcolor: 'background.paper',
                     borderRadius: 2,
                     boxShadow: 10,
                     borderColor: '#ccc',
@@ -213,7 +213,7 @@ export const InventoryPage = () => {
                         lg={2}>
                         <Item
                             sx={{
-                                bgcolor: '#FFF',
+                                bgcolor: 'background.paper',
                                 borderRadius: 2,
                                 boxShadow: 10,
                                 borderColor: '#ccc',
@@ -263,7 +263,7 @@ export const InventoryPage = () => {
                     </Grid>
                     <Grid item lg={10} sm={12} xs={12}>
                         <Item sx={{
-                            bgcolor: '#FFF',
+                            bgcolor: 'background.paper',
                             borderRadius: 2,
                             boxShadow: 10,
                             borderColor: '#ccc',
@@ -274,7 +274,7 @@ export const InventoryPage = () => {
 
 
                             {
-                                (products.length != 0) ? <>
+                                (Array.isArray(products) && products.length !== 0) ? <>
 
                                     <Grid container spacing={5} columns={12} >
 

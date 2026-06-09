@@ -23,7 +23,7 @@ const storeApi: StateCreator<ProductState, [["zustand/devtools", never], ["zusta
             const { products, count } = await ProductService.getProducts({ page, limit });
             set({ products, count });
         } catch (error) {
-            set({ products: undefined, count: 0 })
+            set({ products: [], count: 0 })
 
         }
     },

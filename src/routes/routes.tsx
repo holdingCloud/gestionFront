@@ -24,6 +24,8 @@ export interface Route {
 }
 
 const LoginPage = lazy(async () => await import(/* webpackChunkName: "LoginPage" */'../pages/auth/LoginPage'));
+const ProfilePage = lazy(async () => await import(/* webpackChunkName: "Profile" */'../pages/profile/ProfilePage'));
+const ConfigPage = lazy(async () => await import(/* webpackChunkName: "Config" */'../pages/config/ConfigPage'));
 const DashboardPage = lazy(async () => await import(/* webpackChunkName: "Dashboard" */'../pages/dashboard/DashboardPage'));
 const UserPage = lazy(async () => await import(/* webpackChunkName: "Users" */'../pages/user/UserPage'));
 const InventoryPage = lazy(async () => await import(/* webpackChunkName: "Products" */'../pages/inventory/InventoryPage'));
@@ -56,29 +58,37 @@ export const router = createBrowserRouter([
                         element: <UserPage />
                     },
                     {
-                        path: 'Inventory',
+                        path: 'inventory',
                         element: <InventoryPage />
                     },
                     {
-                        path: 'Buy',
+                        path: 'buy',
                         element: <BuyPage />
                     },
                     {
-                        path: 'Employee',
+                        path: 'employee',
                         element: <EmployeePage />
                     },
                     {
-                        path: 'Client',
+                        path: 'client',
                         element: <ClientPage />
                     },
                     {
-                        path: 'Provider',
+                        path: 'provider',
                         element: <ProviderPage />
                     },
                     {
-                        path: 'Bill',
+                        path: 'bill',
                         element: <BillPage />
-                    }
+                    },
+                    {
+                        path: 'profile',
+                        element: <ProfilePage />
+                    },
+                    {
+                        path: 'config',
+                        element: <ConfigPage />
+                    },
                 ]
             },
 
@@ -138,7 +148,7 @@ export const routes: Route[] = [
         icon: <Inventory2OutlinedIcon />
     },
     {
-        to: 'Buy',
+        to: 'buy',
         //path: 'inventory/*',
         //Component: lazy(() => import(/* webpackChunkName: "Products" */'../pages/invetory/InventoryPage')),
         name: 'Compras',

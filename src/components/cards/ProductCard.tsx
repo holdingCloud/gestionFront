@@ -101,7 +101,7 @@ export const ProductCard = ({ name, description, img, quantity, code, handleOpen
                 </Tooltip>
                 <CardContent
                     sx={{
-                        bgcolor: '#FFF',
+                        bgcolor: 'background.paper',
                         borderRadius: 2,
                         borderColor: '#afaeae',
                     }}>

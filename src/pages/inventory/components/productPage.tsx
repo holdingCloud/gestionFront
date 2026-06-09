@@ -127,7 +127,7 @@ export const ProductPage = ({ open, onClose }: Props) => {
                         <Grid
                             item
                             sx={{
-                                bgcolor: '#FFF',
+                                bgcolor: 'background.paper',
                                 borderRadius: 2,
                                 boxShadow: 10,
                                 borderColor: '#ccc',
@@ -153,7 +153,7 @@ export const ProductPage = ({ open, onClose }: Props) => {
                         <Grid
                             item
                             sx={{
-                                bgcolor: '#FFF',
+                                bgcolor: 'background.paper',
                                 borderRadius: 2,
                                 boxShadow: 10,
                                 borderColor: '#ccc',
@@ -187,7 +187,7 @@ export const ProductPage = ({ open, onClose }: Props) => {
                         <Grid
                             item
                             sx={{
-                                bgcolor: '#FFF',
+                                bgcolor: 'background.paper',
                                 borderRadius: 2,
                                 boxShadow: 10,
                                 borderColor: '#ccc',
@@ -218,7 +218,7 @@ export const ProductPage = ({ open, onClose }: Props) => {
                         <Grid
                             item
                             sx={{
-                                bgcolor: '#FFF',
+                                bgcolor: 'background.paper',
                                 borderRadius: 2,
                                 boxShadow: 10,
                                 borderColor: '#ccc',

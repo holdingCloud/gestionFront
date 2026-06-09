@@ -1,28 +1,22 @@
-import { Box, Button, Divider, IconButton, Toolbar, Typography } from "@mui/material";
+import { Avatar, Badge, Box, Divider, IconButton, ListItemIcon, Menu, MenuItem, Toolbar, Tooltip, Typography } from "@mui/material";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
 import { NavListDrawer } from "./NavListDrawer";
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import MuiDrawer from '@mui/material/Drawer';
 import MenuIcon from '@mui/icons-material/Menu';
-import InboxIcon from '@mui/icons-material/Inbox';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { Outlet } from "react-router-dom";
+import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
+import PhoneInTalkOutlinedIcon from '@mui/icons-material/PhoneInTalkOutlined';
+import { Outlet, useNavigate } from "react-router-dom";
 import { routes } from "../../routes/routes";
 import { useAuthStore } from "../../store/auth/auth.store";
+import { useClientStore } from "../../store/client/client.store";
 import { useIdleTimer } from 'react-idle-timer';
 import { SessionModal } from "../modal/sessionModal";
-
-
-const navLinks = [
-
-    {
-        title: "logout",
-        path: "",
-        icon: <InboxIcon />,
-    },
-]
 
 const drawerWidth = 200;
 
@@ -102,10 +96,39 @@ export const Navbar = () => {
     //TODO: Mantener sesion al presionar boton del modal mantener sesion esto aunque se acabe el tiempo del token
 
     const theme = useTheme();
+    const navigate = useNavigate();
     const logoutUser = useAuthStore(state => state.logoutUser);
     const reNewSession = useAuthStore(state => state.reNewSession);
+    const user = useAuthStore(state => state.user);
+    const porLlamarCount = useClientStore(state => state.porLlamarCount);
+    const fetchPorLlamarCount = useClientStore(state => state.fetchPorLlamarCount);
     const [open, setOpen] = useState(false);
     const [openModal, setOpeModal] = useState(false);
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const menuOpen = Boolean(anchorEl);
+
+    const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleLogout = () => {
+        handleMenuClose();
+        logoutUser();
+    };
+
+    const userInitials = user?.fullName
+        ? user.fullName.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()
+        : '?';
+
+    useEffect(() => {
+        fetchPorLlamarCount();
+        const interval = setInterval(fetchPorLlamarCount, 60_000);
+        return () => clearInterval(interval);
+    }, []);
 
     const onIdle = () => {
         setOpeModal(true);
@@ -149,19 +172,64 @@ export const Navbar = () => {
                         size="large">
                         <MenuIcon />
                     </IconButton>
-                    <Typography variant="h6" sx={{ flexGrow: 1 }}> News</Typography>
-                    <Box sx={{ display: { xs: "none", sm: "block" } }}>
-                        {
-                            navLinks.map(({ title, path }) => (
-                                <Button
-                                    key={path}
-                                    color="inherit"
-                                    component="a"
-                                    href={path}
-                                    onClick={logoutUser}>{title}</Button>
-                            ))
-                        }
-                    </Box>
+                    <Typography variant="h6" sx={{ flexGrow: 1 }}>Gestionate</Typography>
+
+                    <Tooltip title={`${porLlamarCount} cliente${porLlamarCount !== 1 ? 's' : ''} por llamar`}>
+                        <IconButton
+                            color="inherit"
+                            size="small"
+                            sx={{ mr: 1 }}
+                            onClick={() => navigate('/dashboard/client')}
+                        >
+                            <Badge
+                                badgeContent={porLlamarCount}
+                                color="error"
+                                max={99}
+                                invisible={porLlamarCount === 0}
+                            >
+                                <PhoneInTalkOutlinedIcon />
+                            </Badge>
+                        </IconButton>
+                    </Tooltip>
+
+                    <IconButton onClick={handleMenuOpen} size="small" sx={{ ml: 1 }}>
+                        <Avatar
+                            sx={{ width: 36, height: 36, bgcolor: 'rgba(255,255,255,0.25)', fontSize: 14, fontWeight: 700 }}
+                            src={user?.avatar || undefined}
+                        >
+                            {userInitials}
+                        </Avatar>
+                    </IconButton>
+
+                    <Menu
+                        anchorEl={anchorEl}
+                        open={menuOpen}
+                        onClose={handleMenuClose}
+                        disableScrollLock
+                        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                        slotProps={{ paper: { elevation: 4, sx: { mt: 1, minWidth: 180, borderRadius: 2 } } }}
+                    >
+                        <MenuItem disabled sx={{ opacity: '1 !important' }}>
+                            <Typography variant="body2" color="text.secondary" noWrap>
+                                {user?.fullName ?? user?.userName ?? 'Usuario'}
+                            </Typography>
+                        </MenuItem>
+                        <Divider />
+                        <MenuItem onClick={() => { handleMenuClose(); navigate('/dashboard/profile'); }}>
+                            <ListItemIcon><PersonOutlinedIcon fontSize="small" /></ListItemIcon>
+                            Perfil
+                        </MenuItem>
+                        <MenuItem onClick={() => { handleMenuClose(); navigate('/dashboard/config'); }}>
+                            <ListItemIcon><SettingsOutlinedIcon fontSize="small" /></ListItemIcon>
+                            Configuración
+                        </MenuItem>
+                        <Divider />
+                        <MenuItem onClick={handleLogout} sx={{ color: 'error.main' }}>
+                            <ListItemIcon><LogoutOutlinedIcon fontSize="small" color="error" /></ListItemIcon>
+                            Salir
+                        </MenuItem>
+                    </Menu>
                 </Toolbar>
             </AppBar>
 
@@ -169,8 +237,8 @@ export const Navbar = () => {
                 variant="permanent"
                 PaperProps={{
                     sx: {
-                        backgroundColor: "bluelight",
-                        color: "black",
+                        backgroundColor: 'background.paper',
+                        color: 'text.primary',
                     }
                 }}
                 open={open}>
@@ -194,7 +262,7 @@ export const Navbar = () => {
                 sx={{
                     flexGrow: 1,
                     p: 3,
-                    background: "#11101111"
+                    bgcolor: 'background.default',
                 }}>
                 <DrawerHeader />
 

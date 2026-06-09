@@ -20,6 +20,7 @@ const storeApi: StateCreator<UserState, [["zustand/devtools", never], ["zustand/
     count: 0,
     getUsers: async (page, limit, filter) => {
         try {
+            console.log(filter)
             const { data, count } = await UserService.getUsers({ page, limit }, filter);
             set({ users: data, count });
         } catch (error) {

@@ -38,17 +38,6 @@ export const UserForm = ({
             <DialogContent>
                 <DialogContentText>
 
-                    <TextField
-                        fullWidth
-                        size="small"
-                        name="userName"
-                        label="Nick Name"
-                        value={values.userName}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        error={touched.userName && Boolean(errors.userName)}
-                        helperText={touched.userName && errors.userName}
-                    />
 
                     <TextField
                         fullWidth

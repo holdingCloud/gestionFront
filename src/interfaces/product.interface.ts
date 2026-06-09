@@ -1,6 +1,9 @@
 export interface ProductResponse {
-    products: Products[],
-    count: number
+    data: Products[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
 }
 
 export interface Products {

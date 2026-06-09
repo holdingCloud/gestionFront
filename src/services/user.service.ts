@@ -86,7 +86,7 @@ export class UserService {
 
     static changeStatus = async (id: number, status: boolean): Promise<Users> => {
         try {
-            const { data } = await gestionApi.patch<Users>(`/users/${id}`, { status });
+            const { data } = await gestionApi.patch<Users>(`/users/${id}`, { isActive: status });
 
             return data;
 

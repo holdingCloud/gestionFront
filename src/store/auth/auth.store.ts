@@ -24,7 +24,9 @@ const storeApi: StateCreator<AuthState> = (set, get) => ({
     loginUser: async (email: string, password: string) => {
         try {
             const { accessToken, refreshToken, user } = await AuthService.login(email, password);
-            set({ status: 'authorized', accessToken, refreshToken, user });
+            set({ status: 'loading-session', accessToken, refreshToken, user });
+            await new Promise(resolve => setTimeout(resolve, 5000));
+            set({ status: 'authorized' });
         } catch (error) {
             set({ status: 'unauthorized', accessToken: undefined, refreshToken: undefined, user: undefined, error: true });
         }

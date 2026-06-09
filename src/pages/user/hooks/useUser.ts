@@ -27,7 +27,7 @@ export const useUser = () => {
     const [openDialog, setOpenDialog] = useState(false);
     const [deleteId, setDeleteId] = useState<number>(0);
     const [hiddeButton, setHiddeButton] = useState(true);
-    const [filter, setFilter] = useState<{ fullname: string, email: string }>({ fullname: "", email: "" });
+    const [filter, setFilter] = useState<{ fullName: string, email: string }>({ fullName: "", email: "" });
 
     const handleClickShowPassword = () => {
         setShowPassword(!showPassword);
@@ -111,8 +111,8 @@ export const useUser = () => {
     }
 
 
-    const handleFilter = (fullname: string, email: string) => {
-        setFilter({ fullname, email });
+    const handleFilter = (fullName: string, email: string) => {
+        setFilter({ fullName, email });
         setPage(1);
         setRowsPerPage(10);
     }

@@ -19,7 +19,7 @@ export const UserTable = ({
     return (
         <Grid
             sx={{
-                bgcolor: '#FFF',
+                bgcolor: 'background.paper',
                 borderRadius: 2,
                 boxShadow: 10,
                 borderColor: '#ccc',
@@ -58,7 +58,7 @@ export const UserTable = ({
                                     {row.fullName}
                                 </TableCell>
                                 <TableCell >{row.email}</TableCell>
-                                <TableCell >{row.role}</TableCell>
+                                <TableCell >{row.rol}</TableCell>
                                 <TableCell >{
                                     row.isActive ?
                                         (<Tooltip onClick={() => handleActive(row.id, false)} title="ACTIVO" sx={{ cursor: "pointer" }}>
