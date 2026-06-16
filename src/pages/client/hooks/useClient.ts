@@ -7,6 +7,7 @@ import { useClientStore } from "../../../store";
 export const useClient = () => {
 
     const allClients = useClientStore(state => state.clients);
+    const loading = useClientStore(state => state.loading);
     const getClients = useClientStore(state => state.getClients);
     const createClient = useClientStore(state => state.createClient);
     const deleteClient = useClientStore(state => state.deleteClient);
@@ -21,7 +22,8 @@ export const useClient = () => {
     const [deleteId, setDeleteId] = useState<number>(0);
     const [hiddeButton, setHiddeButton] = useState(true);
     const [nameFilter, setNameFilter] = useState('');
-    const [cityFilter, setCityFilter] = useState('');
+    const [communeFilter, setCommuneFilter] = useState('');
+    const [addressFilter, setAddressFilter] = useState('');
     const [statusFilter, setStatusFilter] = useState('');
     const [purchasesOpen, setPurchasesOpen] = useState(false);
     const [dialogClientId, setDialogClientId] = useState<number>(0);
@@ -59,8 +61,10 @@ export const useClient = () => {
             fullname: data.fullname ?? '',
             email: data.email ?? '',
             phone: data.phone ?? '',
-            city: data.city ?? '',
             address: data.address ?? '',
+            n_depto_casa: data.n_depto_casa ?? '',
+            referencia: data.referencia ?? '',
+            communeId: data.communeId ?? '',
             frequency: data.frequency ?? '',
         });
     };
@@ -75,7 +79,6 @@ export const useClient = () => {
         updateClient(dataUpdate as any);
         enqueueSnackbar('Cliente actualizado exitosamente', { variant: 'success' });
         resetForm();
-        setTimeout(() => { getClients(); }, 1000);
     };
 
     const onClose = (action: boolean) => {
@@ -86,9 +89,10 @@ export const useClient = () => {
         }
     };
 
-    const handleFilter = ({ name, city, status }: { name: string; city: string; status: string }) => {
+    const handleFilter = ({ name, commune, address, status }: { name: string; commune: string; address: string; status: string }) => {
         setNameFilter(name);
-        setCityFilter(city);
+        setCommuneFilter(commune);
+        setAddressFilter(address);
         setStatusFilter(status);
         setPage(0);
     };
@@ -102,10 +106,11 @@ export const useClient = () => {
     const safeClients = Array.isArray(allClients) ? allClients : [];
 
     const filteredClients = safeClients.filter(c => {
-        const matchName = !nameFilter || (c.fullname ?? '').toLowerCase().includes(nameFilter.toLowerCase());
-        const matchCity = !cityFilter || (c.city ?? '').toLowerCase().includes(cityFilter.toLowerCase());
-        const matchStatus = !statusFilter || c.contactStatus === statusFilter;
-        return matchName && matchCity && matchStatus;
+        const matchName    = !nameFilter    || (c.fullname ?? '').toLowerCase().includes(nameFilter.toLowerCase());
+        const matchCommune = !communeFilter || (c.commune?.name ?? '').toLowerCase().includes(communeFilter.toLowerCase());
+        const matchAddress = !addressFilter || (c.address ?? '').toLowerCase().includes(addressFilter.toLowerCase());
+        const matchStatus  = !statusFilter  || c.contactStatus === statusFilter;
+        return matchName && matchCommune && matchAddress && matchStatus;
     });
 
     const paginatedClients = filteredClients.slice(
@@ -135,13 +140,22 @@ export const useClient = () => {
             fullname: '',
             email: '',
             phone: '',
-            city: '',
             address: '',
+            n_depto_casa: '',
+            referencia: '',
+            communeId: '' as any,
             frequency: '' as any,
         },
-        onSubmit: ({ fullname, email, phone, city, address, frequency }, { resetForm }) => {
+        onSubmit: ({ fullname, email, phone, address, n_depto_casa, referencia, communeId, frequency }, { resetForm }) => {
             const freq = frequency !== '' && frequency !== undefined ? Number(frequency) : undefined;
-            createClient({ fullname, email, phone, city, address, ...(freq ? { frequency: freq } : {}) });
+            const cid = communeId !== '' && communeId !== undefined ? Number(communeId) : undefined;
+            createClient({
+                fullname, email, phone, address,
+                ...(n_depto_casa ? { n_depto_casa } : {}),
+                ...(referencia ? { referencia } : {}),
+                ...(cid ? { communeId: cid } : {}),
+                ...(freq ? { frequency: freq } : {}),
+            });
             enqueueSnackbar('Cliente creado exitosamente', { variant: 'success' });
             resetForm();
         },
@@ -151,7 +165,6 @@ export const useClient = () => {
             phone: Yup.string()
                 .matches(/^\+56 9 \d{8}$/, 'Formato inválido. Ej: +56 9 95720483')
                 .required('Requerido'),
-            city: Yup.string().required('Requerido'),
             address: Yup.string().required('Requerido'),
         })
     });
@@ -162,6 +175,7 @@ export const useClient = () => {
 
     return {
         clients: paginatedClients,
+        loading,
         page,
         open,
         values,

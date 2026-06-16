@@ -13,15 +13,15 @@ const statusOptions = [
 export const FilterClientForm = ({ onSetCreateModal, handleFilter }: any) => {
 
     const { handleSubmit, values, handleChange, resetForm, setFieldValue } = useFormik({
-        initialValues: { name: '', city: '', status: '' },
-        onSubmit: ({ name, city, status }) => {
-            handleFilter({ name, city, status });
+        initialValues: { name: '', commune: '', address: '', status: '' },
+        onSubmit: ({ name, commune, address, status }) => {
+            handleFilter({ name, commune, address, status });
         },
     });
 
     const handleClear = () => {
         resetForm();
-        handleFilter({ name: '', city: '', status: '' });
+        handleFilter({ name: '', commune: '', address: '', status: '' });
     };
 
     return (
@@ -49,16 +49,25 @@ export const FilterClientForm = ({ onSetCreateModal, handleFilter }: any) => {
                 label="Nombre"
                 value={values.name}
                 onChange={handleChange}
-                sx={{ flexGrow: 1, minWidth: 160, m: 0.5 }}
+                sx={{ flexGrow: 1, minWidth: 150, m: 0.5 }}
             />
 
             <TextField
                 size="small"
-                name="city"
-                label="Ciudad"
-                value={values.city}
+                name="commune"
+                label="Comuna"
+                value={values.commune}
                 onChange={handleChange}
-                sx={{ flexGrow: 1, minWidth: 160, m: 0.5 }}
+                sx={{ flexGrow: 1, minWidth: 150, m: 0.5 }}
+            />
+
+            <TextField
+                size="small"
+                name="address"
+                label="Dirección"
+                value={values.address}
+                onChange={handleChange}
+                sx={{ flexGrow: 1, minWidth: 150, m: 0.5 }}
             />
 
             <FormControl size="small" sx={{ minWidth: 160, m: 0.5 }}>

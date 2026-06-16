@@ -1,6 +1,6 @@
 import { EditOutlined, DeleteForeverOutlined } from "@mui/icons-material"
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
-import { Grid, TableHead, TableRow, TableCell, TableBody, Tooltip, ButtonGroup, Button, Chip, IconButton, Typography } from "@mui/material"
+import { Box, CircularProgress, Grid, TableHead, TableRow, TableCell, TableBody, Tooltip, ButtonGroup, Button, Chip, IconButton, Typography } from "@mui/material"
 import { DataTable } from "../../../components"
 
 const statusColor: Record<string, 'warning' | 'error' | 'success' | 'default'> = {
@@ -11,6 +11,30 @@ const statusColor: Record<string, 'warning' | 'error' | 'success' | 'default'> =
 
 const cellSx = { px: 1, py: 0.75 };
 
+function formatDate(iso: string | null): string {
+    if (!iso) return '-';
+    return new Date(iso).toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function getNextEstimatedDate(row: any): string | null {
+    const freqs: any[] = row.frequencies ?? [];
+    const dates = freqs
+        .map((f: any) => f.nextEstimatedDate)
+        .filter(Boolean)
+        .sort();
+    return dates[0] ?? null;
+}
+
+function getLastPurchaseDate(row: any): string | null {
+    const freqs: any[] = row.frequencies ?? [];
+    const dates = freqs
+        .map((f: any) => f.actualPurchaseDate)
+        .filter(Boolean)
+        .sort()
+        .reverse();
+    return dates[0] ?? null;
+}
+
 export const ClientTable = ({
     count,
     page,
@@ -18,6 +42,7 @@ export const ClientTable = ({
     handleChangePage,
     handleChangeRowsPerPage,
     clients,
+    loading,
     handleUpdate,
     handleDelete,
     handlePurchases,
@@ -46,32 +71,54 @@ export const ClientTable = ({
                 >
                     <TableHead>
                         <TableRow>
-                            <TableCell sx={cellSx}>Nombre</TableCell>
-                            <TableCell sx={cellSx}>Email</TableCell>
-                            <TableCell sx={cellSx}>Teléfono</TableCell>
-                            <TableCell sx={cellSx}>Ciudad</TableCell>
+                            <TableCell sx={cellSx}>Comuna</TableCell>
                             <TableCell sx={cellSx}>Dirección</TableCell>
+                            <TableCell sx={cellSx}>Referencia</TableCell>
+                            <TableCell sx={cellSx}>Teléfono</TableCell>
+                            <TableCell sx={cellSx}>Nombre</TableCell>
                             <TableCell sx={cellSx}>Estado</TableCell>
                             <TableCell sx={cellSx}>Frecuencia</TableCell>
-                            <TableCell sx={cellSx}>Compra</TableCell>
+                            <TableCell sx={cellSx}>Última compra</TableCell>
+                            <TableCell sx={cellSx}>Fecha estimada</TableCell>
+                            <TableCell sx={cellSx} align="center">Compra</TableCell>
                             <TableCell sx={cellSx}>Acciones</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {clients?.length !== 0 ? clients?.map((row: any) => (
+                        {loading ? (
+                            <TableRow>
+                                <TableCell colSpan={11} sx={{ py: 6 }}>
+                                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                                        <CircularProgress />
+                                    </Box>
+                                </TableCell>
+                            </TableRow>
+                        ) : clients?.length !== 0 ? clients?.map((row: any) => (
                             <TableRow
                                 key={row.id}
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                             >
-                                <TableCell component="th" scope="row" sx={cellSx}>
-                                    <Typography variant="body2" noWrap sx={{ maxWidth: 130 }}>{row.fullname}</Typography>
+                                <TableCell sx={cellSx}>
+                                    <Typography variant="body2" noWrap sx={{ maxWidth: 120 }}>
+                                        {row.commune?.name ?? '-'}
+                                    </Typography>
                                 </TableCell>
                                 <TableCell sx={cellSx}>
-                                    <Typography variant="body2" noWrap sx={{ maxWidth: 160 }}>{row.email}</Typography>
+                                    <Typography variant="body2" noWrap sx={{ maxWidth: 180 }}>
+                                        {row.address}{row.n_depto_casa ? `, ${row.n_depto_casa}` : ''}
+                                    </Typography>
                                 </TableCell>
-                                <TableCell sx={cellSx}>{row.phone}</TableCell>
-                                <TableCell sx={cellSx}>{row.city}</TableCell>
-                                <TableCell sx={cellSx}>{row.address}</TableCell>
+                                <TableCell sx={cellSx}>
+                                    <Typography variant="body2" noWrap sx={{ maxWidth: 130 }} color={row.referencia ? 'text.primary' : 'text.disabled'}>
+                                        {row.referencia ?? '-'}
+                                    </Typography>
+                                </TableCell>
+                                <TableCell sx={cellSx}>
+                                    <Typography variant="body2" noWrap sx={{ maxWidth: 130 }}>{row.phone}</Typography>
+                                </TableCell>
+                                <TableCell component="th" scope="row" sx={cellSx}>
+                                    <Typography variant="body2" noWrap sx={{ maxWidth: 140 }}>{row.fullname}</Typography>
+                                </TableCell>
                                 <TableCell sx={cellSx}>
                                     <Chip
                                         label={row.contactStatus ?? '-'}
@@ -82,8 +129,18 @@ export const ClientTable = ({
                                 <TableCell sx={cellSx}>
                                     {row.frequency != null
                                         ? <Typography variant="caption" fontWeight={600}>{row.frequency} Días</Typography>
-                                        : <Typography variant="caption" color="text.secondary">0 Días</Typography>
+                                        : <Typography variant="caption" color="text.secondary">-</Typography>
                                     }
+                                </TableCell>
+                                <TableCell sx={cellSx}>
+                                    <Typography variant="caption" noWrap>
+                                        {formatDate(getLastPurchaseDate(row))}
+                                    </Typography>
+                                </TableCell>
+                                <TableCell sx={cellSx}>
+                                    <Typography variant="caption" noWrap>
+                                        {formatDate(getNextEstimatedDate(row))}
+                                    </Typography>
                                 </TableCell>
                                 <TableCell sx={cellSx} align="center">
                                     <Tooltip title="Ver y registrar compras">
@@ -105,7 +162,7 @@ export const ClientTable = ({
                             </TableRow>
                         )) : (
                             <TableRow>
-                                <TableCell colSpan={9} sx={{ textAlign: 'center' }}>No se encontraron datos</TableCell>
+                                <TableCell colSpan={11} sx={{ textAlign: 'center' }}>No se encontraron datos</TableCell>
                             </TableRow>
                         )}
                     </TableBody>

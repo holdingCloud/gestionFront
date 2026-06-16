@@ -14,6 +14,7 @@ import RecentActorsIcon from '@mui/icons-material/RecentActors';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import SpaceDashboardIcon from '@mui/icons-material/SpaceDashboard';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined';
 
 export interface Route {
     to: string;
@@ -36,6 +37,7 @@ const EmployeePage = lazy(async () => await import(/* webpackChunkName: "Product
 const ClientPage = lazy(async () => await import(/* webpackChunkName: "Products" */'../pages/client/ClientPage'));
 const ProviderPage = lazy(async () => await import(/* webpackChunkName: "Products" */'../pages/provider/ProviderPage'));
 const BillPage = lazy(async () => await import(/* webpackChunkName: "Products" */'../pages/bill/BillPage'));
+const ReportsPage = lazy(async () => await import(/* webpackChunkName: "Reports" */'../pages/reports/ReportsPage'));
 
 //TODO: Agregar que todo redireccionamiento vuelva al dashboard
 
@@ -88,6 +90,10 @@ export const router = createBrowserRouter([
                     {
                         path: 'config',
                         element: <ConfigPage />
+                    },
+                    {
+                        path: 'reports',
+                        element: <ReportsPage />
                     },
                 ]
             },
@@ -181,5 +187,10 @@ export const routes: Route[] = [
         //Component: lazy(() => import(/* webpackChunkName: "Products" */'../pages/invetory/InventoryPage')),
         name: 'Hoja de venta',
         icon: <ListAltIcon />
+    },
+    {
+        to: 'reports',
+        name: 'Reportes',
+        icon: <AssessmentOutlinedIcon />
     },
 ];

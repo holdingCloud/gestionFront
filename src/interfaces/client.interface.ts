@@ -18,10 +18,13 @@ export interface ClientProductFrequency {
 export interface ClientResponse {
     id: number;
     fullname: string;
-    city: string;
     address: string;
+    n_depto_casa: string | null;
+    referencia: string | null;
     phone: string;
     email: string;
+    communeId: number | null;
+    commune?: { id: number; name: string; regionId: number } | null;
     available: boolean;
     contactStatus: string;
     frequency: number | null;
@@ -41,10 +44,12 @@ export interface ClientPaginatedResponse {
 
 export interface ClientBody {
     fullname: string;
-    city: string;
     address: string;
+    n_depto_casa?: string;
+    referencia?: string;
     phone: string;
     email: string;
+    communeId?: number;
     frequency?: number;
 }
 

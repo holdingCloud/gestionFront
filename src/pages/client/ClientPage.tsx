@@ -11,6 +11,7 @@ const ClientPage = () => {
 
     const {
         clients,
+        loading,
         page,
         open,
         values,
@@ -67,6 +68,7 @@ const ClientPage = () => {
                 handleChangePage={handleChangePage}
                 handleChangeRowsPerPage={handleChangeRowsPerPage}
                 clients={clients}
+                loading={loading}
                 handleUpdate={handleUpdate}
                 handleDelete={handleDelete}
                 handlePurchases={handlePurchases}
