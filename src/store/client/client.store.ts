@@ -44,7 +44,7 @@ const storeApi: StateCreator<ClientState> = (set, get) => ({
         }
     },
     updateClient: async (clientData) => {
-        const { id, createdAt, updatedAt, contactStatus, frequencies, clientProductFrequencies, commune, available, ...body } = clientData as any;
+        const { id, createdAt, updatedAt, contactStatus, frequencies, clientProductFrequencies, commune, company, available, ...body } = clientData as any;
         try {
             await ClientService.updateClient(id, body);
             await get().getClients();
@@ -67,7 +67,7 @@ const storeApi: StateCreator<ClientState> = (set, get) => ({
         try {
             const client = get().clients.find(c => c.id === id);
             if (client) {
-                const { createdAt, updatedAt, contactStatus, frequencies, clientProductFrequencies, commune, available, id: _id, ...body } = client as any;
+                const { createdAt, updatedAt, contactStatus, frequencies, clientProductFrequencies, commune, company, available, id: _id, ...body } = client as any;
                 await ClientService.updateClient(id, { ...body, available: status });
                 set(state => ({
                     clients: state.clients.map(c => c.id === id ? { ...c, available: status } : c)

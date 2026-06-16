@@ -76,6 +76,7 @@ export const ClientTable = ({
                             <TableCell sx={cellSx}>Referencia</TableCell>
                             <TableCell sx={cellSx}>Teléfono</TableCell>
                             <TableCell sx={cellSx}>Nombre</TableCell>
+                            <TableCell sx={cellSx}>Empresa</TableCell>
                             <TableCell sx={cellSx}>Estado</TableCell>
                             <TableCell sx={cellSx}>Frecuencia</TableCell>
                             <TableCell sx={cellSx}>Última compra</TableCell>
@@ -87,7 +88,7 @@ export const ClientTable = ({
                     <TableBody>
                         {loading ? (
                             <TableRow>
-                                <TableCell colSpan={11} sx={{ py: 6 }}>
+                                <TableCell colSpan={12} sx={{ py: 6 }}>
                                     <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                                         <CircularProgress />
                                     </Box>
@@ -118,6 +119,11 @@ export const ClientTable = ({
                                 </TableCell>
                                 <TableCell component="th" scope="row" sx={cellSx}>
                                     <Typography variant="body2" noWrap sx={{ maxWidth: 140 }}>{row.fullname}</Typography>
+                                </TableCell>
+                                <TableCell sx={cellSx}>
+                                    <Typography variant="body2" noWrap sx={{ maxWidth: 130 }} color={row.company?.name ? 'text.primary' : 'text.disabled'}>
+                                        {row.company?.name ?? '—'}
+                                    </Typography>
                                 </TableCell>
                                 <TableCell sx={cellSx}>
                                     <Chip
@@ -162,7 +168,7 @@ export const ClientTable = ({
                             </TableRow>
                         )) : (
                             <TableRow>
-                                <TableCell colSpan={11} sx={{ textAlign: 'center' }}>No se encontraron datos</TableCell>
+                                <TableCell colSpan={12} sx={{ textAlign: 'center' }}>No se encontraron datos</TableCell>
                             </TableRow>
                         )}
                     </TableBody>

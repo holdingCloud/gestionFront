@@ -9,13 +9,14 @@ export const useClientPurchasesReport = () => {
     const [startDate, setStartDate] = useState(dayjs().startOf('year').format('YYYY-MM-DD'));
     const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'));
     const [orderBy, setOrderBy] = useState<'frequency' | 'purchases' | 'amount'>('amount');
+    const [companyId, setCompanyId] = useState<number | undefined>(undefined);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
 
     const fetchData = async () => {
         setLoading(true);
         try {
-            const result = await ReportService.getClientsPurchases({ startDate, endDate, orderBy });
+            const result = await ReportService.getClientsPurchases({ startDate, endDate, orderBy, companyId });
             setData(result);
             setPage(0);
         } catch {
@@ -37,6 +38,7 @@ export const useClientPurchasesReport = () => {
         startDate, setStartDate,
         endDate, setEndDate,
         orderBy, setOrderBy,
+        companyId, setCompanyId,
         page, rowsPerPage,
         handleChangePage, handleChangeRowsPerPage,
         fetchData,

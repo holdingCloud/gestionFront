@@ -16,6 +16,7 @@ export class ReportService {
         startDate?: string;
         endDate?: string;
         communeId?: number;
+        companyId?: number;
         period?: 'day' | 'week' | 'month';
     }): Promise<SalesByProductResponse> => {
         try {
@@ -33,6 +34,7 @@ export class ReportService {
         startDate?: string;
         endDate?: string;
         communeId?: number;
+        companyId?: number;
         clientId?: number;
         orderBy?: 'frequency' | 'purchases' | 'amount';
     }): Promise<ClientPurchaseReportItem[]> => {
@@ -51,6 +53,7 @@ export class ReportService {
         startDate?: string;
         endDate?: string;
         communeId?: number;
+        companyId?: number;
         period?: 'day' | 'week' | 'month';
     }): Promise<SalesEvolutionResponse> => {
         try {
@@ -66,6 +69,7 @@ export class ReportService {
 
     static getInactiveClients = async (params?: {
         communeId?: number;
+        companyId?: number;
     }): Promise<InactiveClientItem[]> => {
         try {
             const { data } = await gestionApi.get<InactiveClientItem[]>('/reports/inactive-clients', { params });
@@ -82,6 +86,7 @@ export class ReportService {
         startDate?: string;
         endDate?: string;
         communeId?: number;
+        companyId?: number;
         limit?: number;
     }): Promise<TopClientItem[]> => {
         try {
@@ -99,6 +104,7 @@ export class ReportService {
         startDate?: string;
         endDate?: string;
         communeId?: number;
+        companyId?: number;
     }): Promise<AvgPurchaseFrequencyResponse> => {
         try {
             const { data } = await gestionApi.get<AvgPurchaseFrequencyResponse>('/reports/avg-purchase-frequency', { params });
@@ -114,6 +120,7 @@ export class ReportService {
     static getDailyKpis = async (params?: {
         date?: string;
         communeId?: number;
+        companyId?: number;
     }): Promise<DailyKpisResponse> => {
         try {
             const { data } = await gestionApi.get<DailyKpisResponse>('/reports/daily-kpis', { params });

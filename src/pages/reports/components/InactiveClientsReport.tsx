@@ -14,6 +14,7 @@ import {
 import { DataTable } from '../../../components';
 import { useInactiveClients } from '../hooks/useInactiveClients';
 import { AlertLevel } from '../../../interfaces/report.interface';
+import { CompanySelect } from './CompanySelect';
 
 const alertColor: Record<AlertLevel, 'success' | 'warning' | 'error'> = {
     NORMAL: 'success',
@@ -36,6 +37,7 @@ const cellSx = { px: 1, py: 0.75 };
 export const InactiveClientsReport = () => {
     const {
         data, loading,
+        companyId, setCompanyId,
         page, rowsPerPage,
         handleChangePage, handleChangeRowsPerPage,
         fetchData,
@@ -50,11 +52,16 @@ export const InactiveClientsReport = () => {
 
     return (
         <Box>
-            <Box sx={{ mb: 3 }}>
-                <Button variant="contained" onClick={fetchData} disabled={loading}>
-                    Actualizar
-                </Button>
-            </Box>
+            <Grid container spacing={2} sx={{ mb: 3 }} alignItems="center">
+                <Grid item xs={12} sm={4} md={3}>
+                    <CompanySelect value={companyId} onChange={setCompanyId} />
+                </Grid>
+                <Grid item xs={12} sm={4} md={2}>
+                    <Button variant="contained" onClick={fetchData} disabled={loading} fullWidth>
+                        Aplicar
+                    </Button>
+                </Grid>
+            </Grid>
 
             {loading ? (
                 <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>

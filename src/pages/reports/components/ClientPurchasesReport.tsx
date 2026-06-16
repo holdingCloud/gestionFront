@@ -6,6 +6,7 @@ import {
     FormControl,
     Grid,
     InputLabel,
+    Link,
     MenuItem,
     Select,
     SelectChangeEvent,
@@ -13,17 +14,28 @@ import {
     TableCell,
     TableHead,
     TableRow,
+    Tooltip,
     Typography,
 } from '@mui/material';
+import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
 import { DataTable } from '../../../components';
 import { useClientPurchasesReport } from '../hooks/useClientPurchasesReport';
+import { CompanySelect } from './CompanySelect';
 
 const formatCLP = (v: number) =>
     new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(v);
+
+const formatAvg = (v: number | null) => (v == null ? '-' : v.toFixed(1));
+
+const buildWhatsAppUrl = (phone: string) => {
+    const digits = phone.replace(/\D/g, '');
+    const number = digits.startsWith('56') ? digits : `56${digits}`;
+    return `https://wa.me/${number}?text=${encodeURIComponent('Hola')}`;
+};
 
 const cellSx = { px: 1, py: 0.75 };
 
@@ -33,6 +45,7 @@ export const ClientPurchasesReport = () => {
         startDate, setStartDate,
         endDate, setEndDate,
         orderBy, setOrderBy,
+        companyId, setCompanyId,
         page, rowsPerPage,
         handleChangePage, handleChangeRowsPerPage,
         fetchData,
@@ -80,6 +93,9 @@ export const ClientPurchasesReport = () => {
                         </FormControl>
                     </Grid>
                     <Grid item xs={12} sm={4} md={2}>
+                        <CompanySelect value={companyId} onChange={setCompanyId} />
+                    </Grid>
+                    <Grid item xs={12} sm={4} md={2}>
                         <Button variant="contained" onClick={fetchData} disabled={loading} fullWidth>
                             Aplicar
                         </Button>
@@ -106,6 +122,7 @@ export const ClientPurchasesReport = () => {
                                 <TableRow>
                                     <TableCell sx={cellSx}>Cliente</TableCell>
                                     <TableCell sx={cellSx}>Comuna</TableCell>
+                                    <TableCell sx={cellSx}>Teléfono</TableCell>
                                     <TableCell sx={cellSx} align="right">Compras</TableCell>
                                     <TableCell sx={cellSx} align="right">Frec. prom. (días)</TableCell>
                                     <TableCell sx={cellSx} align="right">Monto total</TableCell>
@@ -120,13 +137,31 @@ export const ClientPurchasesReport = () => {
                                         <TableCell sx={cellSx}>
                                             <Typography variant="body2">{row.communeName}</Typography>
                                         </TableCell>
+                                        <TableCell sx={cellSx}>
+                                            {row.phone ? (
+                                                <Tooltip title={`Enviar WhatsApp a ${row.phone}`}>
+                                                    <Link
+                                                        href={buildWhatsAppUrl(row.phone)}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        underline="hover"
+                                                        sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: '#25D366' }}
+                                                    >
+                                                        <WhatsAppIcon fontSize="small" />
+                                                        <Typography variant="body2">{row.phone}</Typography>
+                                                    </Link>
+                                                </Tooltip>
+                                            ) : (
+                                                <Typography variant="body2" color="text.disabled">-</Typography>
+                                            )}
+                                        </TableCell>
                                         <TableCell sx={cellSx} align="right">{row.purchaseCount}</TableCell>
-                                        <TableCell sx={cellSx} align="right">{row.avgDaysBetweenPurchases.toFixed(1)}</TableCell>
+                                        <TableCell sx={cellSx} align="right">{formatAvg(row.avgDaysBetweenPurchases)}</TableCell>
                                         <TableCell sx={cellSx} align="right">{formatCLP(row.totalAmount)}</TableCell>
                                     </TableRow>
                                 )) : (
                                     <TableRow>
-                                        <TableCell colSpan={5} sx={{ textAlign: 'center' }}>
+                                        <TableCell colSpan={6} sx={{ textAlign: 'center' }}>
                                             Sin datos para el período seleccionado
                                         </TableCell>
                                     </TableRow>

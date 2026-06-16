@@ -44,7 +44,8 @@ export const ClientForm = ({
     errors,
     hiddeButton,
     saveUpdate,
-    cancelUpdate
+    cancelUpdate,
+    companies,
 }: any) => {
     const [regions, setRegions] = useState<Region[]>([]);
     const [valparaisoRegion, setValparaisoRegion] = useState<Region | null>(null);
@@ -113,6 +114,19 @@ export const ClientForm = ({
                         inputProps={{ maxLength: 15 }}
                     />
                 </Box>
+
+                <Autocomplete
+                    size="small"
+                    options={companies ?? []}
+                    getOptionLabel={(o: any) => o.name}
+                    value={(companies ?? []).find((c: any) => c.id === Number(values.companyId)) ?? null}
+                    isOptionEqualToValue={(o: any, v: any) => o.id === v.id}
+                    onChange={(_: any, newVal: any) => setFieldValue('companyId', newVal?.id ?? '')}
+                    renderInput={(params) => (
+                        <TextField {...params} label="Empresa" helperText="Opcional" />
+                    )}
+                    sx={{ mb: 2 }}
+                />
 
                 {/* ── Ubicación ── */}
                 <SectionLabel icon={<PlaceOutlinedIcon fontSize="small" color="action" />} label="Ubicación" />

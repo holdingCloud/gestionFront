@@ -25,6 +25,8 @@ export interface ClientResponse {
     email: string;
     communeId: number | null;
     commune?: { id: number; name: string; regionId: number } | null;
+    companyId: number | null;
+    company?: { id: number; name: string } | null;
     available: boolean;
     contactStatus: string;
     frequency: number | null;
@@ -50,6 +52,7 @@ export interface ClientBody {
     phone: string;
     email: string;
     communeId?: number;
+    companyId?: number;
     frequency?: number;
 }
 

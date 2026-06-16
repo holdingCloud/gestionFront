@@ -8,11 +8,12 @@ export const useAvgFrequency = () => {
     const [loading, setLoading] = useState(false);
     const [startDate, setStartDate] = useState(dayjs().startOf('year').format('YYYY-MM-DD'));
     const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'));
+    const [companyId, setCompanyId] = useState<number | undefined>(undefined);
 
     const fetchData = async () => {
         setLoading(true);
         try {
-            const result = await ReportService.getAvgPurchaseFrequency({ startDate, endDate });
+            const result = await ReportService.getAvgPurchaseFrequency({ startDate, endDate, companyId });
             setData(result);
         } catch {
             // ignore
@@ -21,5 +22,5 @@ export const useAvgFrequency = () => {
         }
     };
 
-    return { data, loading, startDate, setStartDate, endDate, setEndDate, fetchData };
+    return { data, loading, startDate, setStartDate, endDate, setEndDate, companyId, setCompanyId, fetchData };
 };

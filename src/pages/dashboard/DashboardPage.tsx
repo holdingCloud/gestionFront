@@ -13,8 +13,8 @@ export const DashboardPage = () => {
     const monthLabel = dayjs().format('MMMM YYYY');
 
     return (
-        <Grid sx={{ display: 'flex' }} container rowSpacing={2} columnSpacing={2}>
-            <Grid item xs={12} sx={{ marginBottom: -50 }}>
+        <Grid container rowSpacing={2} columnSpacing={2}>
+            <Grid item xs={12}>
                 <UrlBreadCrumbs />
             </Grid>
 

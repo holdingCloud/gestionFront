@@ -40,6 +40,7 @@ const ClientPage = () => {
         dialogClientName,
         setPurchasesOpen,
         handlePurchases,
+        companies,
     } = useClient();
 
     return (
@@ -98,6 +99,7 @@ const ClientPage = () => {
                     hiddeButton={hiddeButton}
                     saveUpdate={saveUpdate}
                     cancelUpdate={cancelUpdate}
+                    companies={companies}
                 />
             </CreateModal>
 

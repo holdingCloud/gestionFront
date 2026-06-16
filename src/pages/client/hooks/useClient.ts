@@ -2,7 +2,7 @@ import { ChangeEvent, MouseEvent, useEffect, useState } from "react";
 import { useSnackbar } from 'notistack';
 import { useFormik } from "formik";
 import * as Yup from 'yup';
-import { useClientStore } from "../../../store";
+import { useClientStore, useCompanyStore } from "../../../store";
 
 export const useClient = () => {
 
@@ -12,6 +12,9 @@ export const useClient = () => {
     const createClient = useClientStore(state => state.createClient);
     const deleteClient = useClientStore(state => state.deleteClient);
     const updateClient = useClientStore(state => state.updateClient);
+
+    const companies = useCompanyStore(state => state.companies);
+    const getCompanies = useCompanyStore(state => state.getCompanies);
 
     const { enqueueSnackbar } = useSnackbar();
 
@@ -66,6 +69,7 @@ export const useClient = () => {
             referencia: data.referencia ?? '',
             communeId: data.communeId ?? '',
             frequency: data.frequency ?? '',
+            companyId: data.companyId ?? '',
         });
     };
 
@@ -145,16 +149,19 @@ export const useClient = () => {
             referencia: '',
             communeId: '' as any,
             frequency: '' as any,
+            companyId: '' as any,
         },
-        onSubmit: ({ fullname, email, phone, address, n_depto_casa, referencia, communeId, frequency }, { resetForm }) => {
+        onSubmit: ({ fullname, email, phone, address, n_depto_casa, referencia, communeId, frequency, companyId }, { resetForm }) => {
             const freq = frequency !== '' && frequency !== undefined ? Number(frequency) : undefined;
             const cid = communeId !== '' && communeId !== undefined ? Number(communeId) : undefined;
+            const compId = companyId !== '' && companyId !== undefined ? Number(companyId) : undefined;
             createClient({
                 fullname, email, phone, address,
                 ...(n_depto_casa ? { n_depto_casa } : {}),
                 ...(referencia ? { referencia } : {}),
                 ...(cid ? { communeId: cid } : {}),
                 ...(freq ? { frequency: freq } : {}),
+                ...(compId ? { companyId: compId } : {}),
             });
             enqueueSnackbar('Cliente creado exitosamente', { variant: 'success' });
             resetForm();
@@ -171,6 +178,7 @@ export const useClient = () => {
 
     useEffect(() => {
         getClients();
+        getCompanies();
     }, []);
 
     return {
@@ -186,6 +194,7 @@ export const useClient = () => {
         rowsPerPage,
         createModal,
         hiddeButton,
+        companies,
         handleSubmit,
         handleChange,
         handleBlur,

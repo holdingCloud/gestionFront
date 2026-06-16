@@ -5,13 +5,14 @@ import { InactiveClientItem } from '../../../interfaces/report.interface';
 export const useInactiveClients = () => {
     const [data, setData] = useState<InactiveClientItem[]>([]);
     const [loading, setLoading] = useState(false);
+    const [companyId, setCompanyId] = useState<number | undefined>(undefined);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
 
     const fetchData = async () => {
         setLoading(true);
         try {
-            const result = await ReportService.getInactiveClients();
+            const result = await ReportService.getInactiveClients({ companyId });
             setData(result);
             setPage(0);
         } catch {
@@ -30,6 +31,7 @@ export const useInactiveClients = () => {
     return {
         data,
         loading,
+        companyId, setCompanyId,
         page, rowsPerPage,
         handleChangePage, handleChangeRowsPerPage,
         fetchData,

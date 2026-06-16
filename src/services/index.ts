@@ -6,3 +6,4 @@ export { UploadService } from "./upload.service";
 export { LocationService } from "./location.service";
 export type { Region, Commune } from "./location.service";
 export { ReportService } from "./report.service";
+export { CompanyService } from "./company.service";

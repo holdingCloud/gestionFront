@@ -24,6 +24,7 @@ import { BarChart } from '@mui/x-charts/BarChart';
 import dayjs from 'dayjs';
 import { DataTable } from '../../../components';
 import { useSalesByProduct } from '../hooks/useSalesByProduct';
+import { CompanySelect } from './CompanySelect';
 
 const formatCLP = (v: number) =>
     new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(v);
@@ -36,6 +37,7 @@ export const SalesByProductReport = () => {
         startDate, setStartDate,
         endDate, setEndDate,
         period, setPeriod,
+        companyId, setCompanyId,
         page, rowsPerPage,
         handleChangePage, handleChangeRowsPerPage,
         fetchData,
@@ -85,6 +87,9 @@ export const SalesByProductReport = () => {
                                 <MenuItem value="month">Mes</MenuItem>
                             </Select>
                         </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={4} md={2}>
+                        <CompanySelect value={companyId} onChange={setCompanyId} />
                     </Grid>
                     <Grid item xs={12} sm={4} md={2}>
                         <Button variant="contained" onClick={fetchData} disabled={loading} fullWidth>

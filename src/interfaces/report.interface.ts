@@ -26,8 +26,9 @@ export interface ClientPurchaseReportItem {
     clientId: number;
     clientName: string;
     communeName: string;
+    phone?: string | null;
     purchaseCount: number;
-    avgDaysBetweenPurchases: number;
+    avgDaysBetweenPurchases: number | null;
     totalAmount: number;
 }
 

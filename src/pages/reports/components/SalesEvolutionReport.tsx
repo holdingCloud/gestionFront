@@ -18,6 +18,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LineChart } from '@mui/x-charts/LineChart';
 import dayjs from 'dayjs';
 import { useSalesEvolution } from '../hooks/useSalesEvolution';
+import { CompanySelect } from './CompanySelect';
 
 const formatCLP = (v: number) =>
     new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(v);
@@ -35,6 +36,7 @@ export const SalesEvolutionReport = () => {
         startDate, setStartDate,
         endDate, setEndDate,
         period, setPeriod,
+        companyId, setCompanyId,
         fetchData,
     } = useSalesEvolution();
 
@@ -80,6 +82,9 @@ export const SalesEvolutionReport = () => {
                                 <MenuItem value="month">Mes</MenuItem>
                             </Select>
                         </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={4} md={2}>
+                        <CompanySelect value={companyId} onChange={setCompanyId} />
                     </Grid>
                     <Grid item xs={12} sm={4} md={2}>
                         <Button variant="contained" onClick={fetchData} disabled={loading} fullWidth>

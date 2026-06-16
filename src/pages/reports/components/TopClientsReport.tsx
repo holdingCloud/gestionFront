@@ -22,6 +22,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
 import { DataTable } from '../../../components';
 import { useTopClients } from '../hooks/useTopClients';
+import { CompanySelect } from './CompanySelect';
 
 const formatCLP = (v: number) =>
     new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(v);
@@ -37,6 +38,7 @@ export const TopClientsReport = () => {
         startDate, setStartDate,
         endDate, setEndDate,
         limit, setLimit,
+        companyId, setCompanyId,
         page, rowsPerPage,
         handleChangePage, handleChangeRowsPerPage,
         fetchData,
@@ -83,6 +85,9 @@ export const TopClientsReport = () => {
                                 <MenuItem value="50">Top 50</MenuItem>
                             </Select>
                         </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={4} md={2}>
+                        <CompanySelect value={companyId} onChange={setCompanyId} />
                     </Grid>
                     <Grid item xs={12} sm={4} md={2}>
                         <Button variant="contained" onClick={fetchData} disabled={loading} fullWidth>

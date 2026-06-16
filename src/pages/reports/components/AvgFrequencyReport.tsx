@@ -13,12 +13,14 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { BarChart } from '@mui/x-charts/BarChart';
 import dayjs from 'dayjs';
 import { useAvgFrequency } from '../hooks/useAvgFrequency';
+import { CompanySelect } from './CompanySelect';
 
 export const AvgFrequencyReport = () => {
     const {
         data, loading,
         startDate, setStartDate,
         endDate, setEndDate,
+        companyId, setCompanyId,
         fetchData,
     } = useAvgFrequency();
 
@@ -49,6 +51,9 @@ export const AvgFrequencyReport = () => {
                             onChange={val => { if (val?.isValid()) setEndDate(val.format('YYYY-MM-DD')); }}
                             slotProps={{ textField: { size: 'small', fullWidth: true } }}
                         />
+                    </Grid>
+                    <Grid item xs={12} sm={4} md={2}>
+                        <CompanySelect value={companyId} onChange={setCompanyId} />
                     </Grid>
                     <Grid item xs={12} sm={4} md={2}>
                         <Button variant="contained" onClick={fetchData} disabled={loading} fullWidth>
