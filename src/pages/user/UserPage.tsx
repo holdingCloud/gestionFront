@@ -1,12 +1,5 @@
-import {
-    Container,
-} from "@mui/material";
-import {
-    CreateModal,
-    DeleteModal,
-    DialogModal,
-    UrlBreadCrumbs
-} from "../../components";
+import { Container } from "@mui/material";
+import { CreateModal, DeleteModal, UrlBreadCrumbs } from "../../components";
 import { useUser } from "./hooks/useUser";
 import { UserForm } from "./components/userForm";
 import { FilterUserForm } from "./components/filterUserForm";
@@ -14,9 +7,7 @@ import { UserTable } from "./components/userTable";
 
 const UserPage = () => {
 
-
     const {
-        //Propierties
         users,
         page,
         open,
@@ -25,14 +16,14 @@ const UserPage = () => {
         errors,
         touched,
         rowsPerPage,
-        openDialog,
         createModal,
         showPassword,
         hiddeButton,
-        //Methods
+        roles,
         handleSubmit,
         handleChange,
         handleBlur,
+        setFieldValue,
         saveUpdate,
         handleActive,
         handleUpdate,
@@ -41,17 +32,13 @@ const UserPage = () => {
         handleChangePage,
         handleChangeRowsPerPage,
         onClose,
-        onCloseDialog,
         onSetCreateModal,
         handleDelete,
         handleFilter,
     } = useUser();
 
-
-
     return (
-        <Container
-            maxWidth={false} disableGutters>
+        <Container maxWidth={false} disableGutters>
 
             <UrlBreadCrumbs />
 
@@ -73,22 +60,17 @@ const UserPage = () => {
             />
 
             <DeleteModal
-                title={'¿Desea Eliminar el usuario?'}
-                content={'Con esta acción borrara al usuario de forma permanente'}
+                title="¿Desea eliminar el usuario?"
+                content="Con esta acción borrará al usuario de forma permanente"
                 open={open}
-                onClose={onClose} />
-            <DialogModal
-                title={'¡Adevertencia!'}
-                content={'Para cambiar la clave del usuario debera digitarla en caso contrario no lo haga para mantener la que ya tiene'}
-                open={openDialog}
-                onClose={onCloseDialog} />
+                onClose={onClose}
+            />
 
             <CreateModal
-                title={'Crear Usuario'}
+                title={hiddeButton ? 'Crear Usuario' : 'Editar Usuario'}
                 open={createModal}
                 onClose={onSetCreateModal}
             >
-
                 <UserForm
                     onSetCreateModal={onSetCreateModal}
                     handleSubmit={handleSubmit}
@@ -96,17 +78,19 @@ const UserPage = () => {
                     touched={touched}
                     handleChange={handleChange}
                     handleBlur={handleBlur}
+                    setFieldValue={setFieldValue}
                     errors={errors}
                     showPassword={showPassword}
                     hiddeButton={hiddeButton}
                     handleClickShowPassword={handleClickShowPassword}
                     saveUpdate={saveUpdate}
                     cancelUpdate={cancelUpdate}
+                    roles={roles}
                 />
             </CreateModal>
-        </Container>
 
-    )
-}
+        </Container>
+    );
+};
 
 export default UserPage;

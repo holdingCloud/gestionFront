@@ -8,32 +8,38 @@ import { RouterProvider } from 'react-router-dom';
 import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import { SnackbarProvider } from 'notistack';
 import { router } from './routes/routes.tsx';
-import { Suspense } from 'react';
+import { Suspense, useMemo } from 'react';
 import BackLoading from './components/backdrop/backLoading.tsx';
+import { useThemeStore } from './store/theme/theme.store.ts';
 
-const theme = createTheme({
-  palette: {
-    mode: 'light',
-    primary: {
-      main: '#1d2b75',
+const AppThemeWrapper = () => {
+  const primaryColor = useThemeStore(state => state.primaryColor);
+  const mode = useThemeStore(state => state.mode);
+
+  const theme = useMemo(() => createTheme({
+    palette: {
+      mode,
+      primary: {
+        main: primaryColor,
+      },
+      secondary: {
+        main: '#f50057',
+      },
     },
-    secondary: {
-      main: '#f50057',
-    },
-  },
-});
+  }), [primaryColor, mode]);
 
-
-
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <>
-    <CssBaseline />
+  return (
     <ThemeProvider theme={theme}>
+      <CssBaseline />
       <SnackbarProvider maxSnack={3} autoHideDuration={2000}>
         <Suspense fallback={<BackLoading action={true} />}>
           <RouterProvider router={router} />
         </Suspense>
       </SnackbarProvider>
     </ThemeProvider>
-  </>,
+  );
+};
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <AppThemeWrapper />
 )

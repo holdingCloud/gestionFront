@@ -14,6 +14,8 @@ import RecentActorsIcon from '@mui/icons-material/RecentActors';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import SpaceDashboardIcon from '@mui/icons-material/SpaceDashboard';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined';
+import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
 
 export interface Route {
     to: string;
@@ -24,6 +26,8 @@ export interface Route {
 }
 
 const LoginPage = lazy(async () => await import(/* webpackChunkName: "LoginPage" */'../pages/auth/LoginPage'));
+const ProfilePage = lazy(async () => await import(/* webpackChunkName: "Profile" */'../pages/profile/ProfilePage'));
+const ConfigPage = lazy(async () => await import(/* webpackChunkName: "Config" */'../pages/config/ConfigPage'));
 const DashboardPage = lazy(async () => await import(/* webpackChunkName: "Dashboard" */'../pages/dashboard/DashboardPage'));
 const UserPage = lazy(async () => await import(/* webpackChunkName: "Users" */'../pages/user/UserPage'));
 const InventoryPage = lazy(async () => await import(/* webpackChunkName: "Products" */'../pages/inventory/InventoryPage'));
@@ -34,6 +38,8 @@ const EmployeePage = lazy(async () => await import(/* webpackChunkName: "Product
 const ClientPage = lazy(async () => await import(/* webpackChunkName: "Products" */'../pages/client/ClientPage'));
 const ProviderPage = lazy(async () => await import(/* webpackChunkName: "Products" */'../pages/provider/ProviderPage'));
 const BillPage = lazy(async () => await import(/* webpackChunkName: "Products" */'../pages/bill/BillPage'));
+const ReportsPage = lazy(async () => await import(/* webpackChunkName: "Reports" */'../pages/reports/ReportsPage'));
+const CompanyPage = lazy(async () => await import(/* webpackChunkName: "Company" */'../pages/company/CompanyPage'));
 
 //TODO: Agregar que todo redireccionamiento vuelva al dashboard
 
@@ -56,29 +62,45 @@ export const router = createBrowserRouter([
                         element: <UserPage />
                     },
                     {
-                        path: 'Inventory',
+                        path: 'inventory',
                         element: <InventoryPage />
                     },
                     {
-                        path: 'Buy',
+                        path: 'buy',
                         element: <BuyPage />
                     },
                     {
-                        path: 'Employee',
+                        path: 'employee',
                         element: <EmployeePage />
                     },
                     {
-                        path: 'Client',
+                        path: 'client',
                         element: <ClientPage />
                     },
                     {
-                        path: 'Provider',
+                        path: 'provider',
                         element: <ProviderPage />
                     },
                     {
-                        path: 'Bill',
+                        path: 'bill',
                         element: <BillPage />
-                    }
+                    },
+                    {
+                        path: 'profile',
+                        element: <ProfilePage />
+                    },
+                    {
+                        path: 'config',
+                        element: <ConfigPage />
+                    },
+                    {
+                        path: 'reports',
+                        element: <ReportsPage />
+                    },
+                    {
+                        path: 'company',
+                        element: <CompanyPage />
+                    },
                 ]
             },
 
@@ -126,6 +148,13 @@ export const routes: Route[] = [
         icon: <SupervisorAccountOutlinedIcon />
     },
     {
+        to: 'client',
+        //path: 'inventory/*',
+        //Component: lazy(() => import(/* webpackChunkName: "Products" */'../pages/invetory/InventoryPage')),
+        name: 'Clientes',
+        icon: <RecentActorsIcon />
+    },
+    {
         to: 'employee',
         name: 'Empleados',
         icon: <SupervisedUserCircleIcon />
@@ -138,18 +167,11 @@ export const routes: Route[] = [
         icon: <Inventory2OutlinedIcon />
     },
     {
-        to: 'Buy',
+        to: 'buy',
         //path: 'inventory/*',
         //Component: lazy(() => import(/* webpackChunkName: "Products" */'../pages/invetory/InventoryPage')),
         name: 'Compras',
         icon: <ShoppingBasketIcon />
-    },
-    {
-        to: 'client',
-        //path: 'inventory/*',
-        //Component: lazy(() => import(/* webpackChunkName: "Products" */'../pages/invetory/InventoryPage')),
-        name: 'Clientes',
-        icon: <RecentActorsIcon />
     },
     {
         to: 'provider',
@@ -171,5 +193,15 @@ export const routes: Route[] = [
         //Component: lazy(() => import(/* webpackChunkName: "Products" */'../pages/invetory/InventoryPage')),
         name: 'Hoja de venta',
         icon: <ListAltIcon />
+    },
+    {
+        to: 'reports',
+        name: 'Reportes',
+        icon: <AssessmentOutlinedIcon />
+    },
+    {
+        to: 'company',
+        name: 'Empresas',
+        icon: <BusinessOutlinedIcon />
     },
 ];

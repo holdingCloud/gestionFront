@@ -25,10 +25,9 @@ export const DataTable = (
 
             <Table
                 sx={{
-                    '& .MuiTableCell-sizeMedium': {
+                    '& .MuiTableCell-root': {
                         padding: '5px 10px',
                     },
-
                 }}
                 size="small"
                 aria-label="simple table">
@@ -36,7 +35,7 @@ export const DataTable = (
 
                 <TableFooter>
                     <TableRow>
-                        <TableCell >
+                        <TableCell colSpan={99}>
                             <TablePagination
                                 sx={{
                                     display: "flex",

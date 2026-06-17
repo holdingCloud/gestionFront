@@ -7,11 +7,11 @@ import { employeeBody, EmployeeResponse, Employees } from '../interfaces/employe
 export class EmployeeService {
 
 
-    static getEmployees = async ({ skip, take }: pagination) => {
+    static getEmployees = async ({ page, limit }: pagination) => {
         try {
             const queryParams = {
-                skip,
-                take
+                page,
+                limit
             }
 
             const { data } = await gestionApi.get<EmployeeResponse>(`/employee`, {

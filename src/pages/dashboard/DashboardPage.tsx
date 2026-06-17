@@ -1,80 +1,70 @@
-
-import Typography from '@mui/material/Typography';
-import { Grid } from '@mui/material';
+import { Box, CircularProgress, Grid, Typography } from '@mui/material';
 import { LineChart } from '@mui/x-charts/LineChart';
-import { BussinesCard, UrlBreadCrumbs } from '../../components';
-
-const uData = [4000, 3000, 2000, 2780, 1890, 2390, 3490];
-const pData = [2400, 1398, 9800, 3908, 4800, 3800, 4300];
-const xLabels = [
-    'Page A',
-    'Page B',
-    'Page C',
-    'Page D',
-    'Page E',
-    'Page F',
-    'Page G',
-];
-
+import dayjs from 'dayjs';
+import { UrlBreadCrumbs } from '../../components';
+import { useDashboard } from './hooks/useDashboard';
+import { DashboardKpiCards } from './components/DashboardKpiCards';
 
 export const DashboardPage = () => {
+    const { kpis, salesEvolution, loadingKpis, loadingEvolution } = useDashboard();
 
-
+    const xLabels = salesEvolution?.series.map(s => dayjs(s.period).format('DD/MM')) ?? [];
+    const amountData = salesEvolution?.series.map(s => s.totalAmount) ?? [];
+    const monthLabel = dayjs().format('MMMM YYYY');
 
     return (
-        <Grid
-            sx={{ display: "flex" }}
-            container
-            rowSpacing={2}
-            columnSpacing={2}>
-            {/* row 1 */}
-            <Grid item={true} xs={12} sx={{
-                marginBottom: -50
-            }} >
+        <Grid container rowSpacing={2} columnSpacing={2}>
+            <Grid item xs={12}>
                 <UrlBreadCrumbs />
             </Grid>
 
-            <BussinesCard />
+            <DashboardKpiCards kpis={kpis} loading={loadingKpis} />
 
-            <Grid item={true} xs={12} >
-                <Typography variant="h5">Ventas</Typography>
+            <Grid item xs={12}>
+                <Typography variant="h5">
+                    Evolución de ventas — {monthLabel}
+                </Typography>
             </Grid>
 
             <Grid
                 sx={{
-                    bgcolor: '#FFF',
+                    bgcolor: 'background.paper',
                     borderRadius: 2,
                     boxShadow: 10,
                     borderColor: '#ccc',
-                    height: '500px',
-                    padding: 10,
+                    minHeight: '420px',
+                    padding: 4,
                     margin: 2,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                 }}
-                item={true}
-                xs={12} sm={12} md={12} lg={12}
+                item xs={12}
             >
-                <LineChart
-
-                    height={450}
-                    series={[
-                        { data: pData, label: 'pv', yAxisKey: 'leftAxisId' },
-                        { data: uData, label: 'uv', yAxisKey: 'rightAxisId' },
-                    ]}
-                    xAxis={[{ scaleType: 'point', data: xLabels }]}
-                    yAxis={[{ id: 'leftAxisId' }, { id: 'rightAxisId' }]}
-                    rightAxis="rightAxisId"
-
-                    margin={{ left: 100, right: 40, top: 50, bottom: 20 }}
-                    grid={{ vertical: true, horizontal: true }}
-
-                />
+                {loadingEvolution ? (
+                    <CircularProgress />
+                ) : salesEvolution?.series.length ? (
+                    <Box sx={{ width: '100%' }}>
+                        <LineChart
+                            height={380}
+                            series={[{ data: amountData, label: 'Ventas ($)' }]}
+                            xAxis={[{
+                                scaleType: 'point',
+                                data: xLabels,
+                                tickLabelStyle: { angle: -45, textAnchor: 'end', fontSize: 11 },
+                            }]}
+                            margin={{ left: 90, right: 40, top: 60, bottom: 70 }}
+                            grid={{ vertical: true, horizontal: true }}
+                        />
+                    </Box>
+                ) : (
+                    <Typography color="text.secondary">
+                        Sin ventas registradas este mes
+                    </Typography>
+                )}
             </Grid>
-
-
-
-
         </Grid>
     );
-}
+};
 
 export default DashboardPage;

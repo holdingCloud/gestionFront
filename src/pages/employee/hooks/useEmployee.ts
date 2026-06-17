@@ -17,10 +17,9 @@ export const useEmployee = () => {
     const [hiddeButton, setHiddeButton] = useState(true);
     const [open, setOpen] = useState<boolean>(false);
     const [filter, setFilter] = useState<{ fullname: string, email: string }>({ fullname: "", email: "" });
-    const [page, setPage] = useState(0);
+    const [page, setPage] = useState(1);
     const [deleteId, setDeleteId] = useState<number>(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [skip, setSkip] = useState(0);
 
     const handleChangePage = (
         event: MouseEvent<HTMLButtonElement> | null,
@@ -28,19 +27,18 @@ export const useEmployee = () => {
     ) => {
         event?.preventDefault();
         setPage(newPage);
-        setSkip(rowsPerPage * newPage);
     };
 
     const handleChangeRowsPerPage = (
         event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     ) => {
         setRowsPerPage(parseInt(event.target.value, 10));
-        setPage(0);
+        setPage(1);
     };
 
     const handleFilter = (fullname: string, email: string) => {
         setFilter({ fullname, email });
-        setSkip(0);
+        setPage(1);
         setRowsPerPage(0);
     }
 
@@ -60,7 +58,7 @@ export const useEmployee = () => {
         resetForm();
 
         setTimeout(() => {
-            getEmployees(skip, rowsPerPage, {});
+            getEmployees(page, rowsPerPage, {});
         }, 1000)
 
     }
@@ -72,10 +70,9 @@ export const useEmployee = () => {
         setValues({ ...data });
     }
 
-    const handleActive = (id: number, status: boolean) => {
+    const handleActive = (_id: number, _status: boolean) => {
         //changeStatus(id, status);
         enqueueSnackbar('El estado usuario actualizado exitosamente', { variant: 'success' });
-        console.log(id, status);
         setTimeout(() => {
             //getUsers(skip, rowsPerPage, filter);
         }, 1000)
@@ -144,8 +141,8 @@ export const useEmployee = () => {
 
 
     useEffect(() => {
-        getEmployees(skip, rowsPerPage, filter);
-    }, [skip, rowsPerPage, filter]);
+        getEmployees(page, rowsPerPage, filter);
+    }, [page, rowsPerPage, filter]);
 
     return {
         //Properties

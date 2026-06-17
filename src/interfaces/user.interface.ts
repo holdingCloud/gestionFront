@@ -1,27 +1,36 @@
+export interface Role {
+    id: number;
+    type: string;
+}
+
 export interface UserResponse {
-    users: Users[];
-    count: number;
+    data: Users[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
 }
 
 export interface Users {
     id: number;
-    userName: string;
     fullName: string;
     email: string;
-    password: string;
-    avatar: string;
+    imagen: string;
+    rol: string;
     isActive: boolean;
+    isLoged: boolean;
 }
 
-export interface userBody {
-    userName: string;
+export interface UserBody {
     fullName: string;
     email: string;
-    password: string;
-    avatar: string;
+    password?: string;
+    imagen: string;
+    rol: number;
+    isActive?: boolean;
 }
 
-export interface userFilter {
-    fullname: string;
-    email: string;
+export interface UserFilter {
+    fullName?: string;
+    email?: string;
 }

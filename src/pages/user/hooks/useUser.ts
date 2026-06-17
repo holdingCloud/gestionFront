@@ -2,10 +2,11 @@ import { ChangeEvent, MouseEvent, useEffect, useState } from "react";
 import { useSnackbar } from 'notistack';
 import { useFormik } from "formik";
 import * as Yup from 'yup';
-import { useAuthStore, useUserStore } from "../../../store";
+import { useUserStore } from "../../../store";
+import { Role, UserFilter } from "../../../interfaces";
+import { UserService } from "../../../services";
 
 export const useUser = () => {
-
 
     const users = useUserStore(state => state.users);
     const count = useUserStore(state => state.count);
@@ -14,111 +15,92 @@ export const useUser = () => {
     const deleteUser = useUserStore(state => state.deleteUser);
     const changeStatus = useUserStore(state => state.changeStatus);
     const updateUser = useUserStore(state => state.updateUser);
-    const checkAuthStatus = useAuthStore(state => state.checkAuthStatus);
-
 
     const { enqueueSnackbar } = useSnackbar();
 
     const [showPassword, setShowPassword] = useState(false);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [skip, setSkip] = useState(0);
     const [createModal, setCreateModal] = useState(false);
-    const [open, setOpen] = useState<boolean>(false);
-    const [openDialog, setOpenDialog] = useState(false);
-    const [deleteId, setDeleteId] = useState<number>(0);
+    const [open, setOpen] = useState(false);
+    const [deleteId, setDeleteId] = useState(0);
     const [hiddeButton, setHiddeButton] = useState(true);
-    const [filter, setFilter] = useState<{ fullname: string, email: string }>({ fullname: "", email: "" });
+    const [filter, setFilter] = useState<UserFilter>({ fullName: '', email: '' });
+    const [roles, setRoles] = useState<Role[]>([]);
 
-    const handleClickShowPassword = () => {
-        setShowPassword(!showPassword);
-    };
+    const handleClickShowPassword = () => setShowPassword(prev => !prev);
 
-
-    const handleChangePage = (
-        event: MouseEvent<HTMLButtonElement> | null,
-        newPage: number,
-    ) => {
-        event?.preventDefault();
+    const handleChangePage = (_: MouseEvent<HTMLButtonElement> | null, newPage: number) => {
         setPage(newPage);
-        setSkip(rowsPerPage * newPage);
     };
 
-    const handleChangeRowsPerPage = (
-        event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-    ) => {
+    const handleChangeRowsPerPage = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
     };
 
-    const onCloseDialog = () => {
-        setOpenDialog(false);
-    }
-
     const handleDelete = (id: number) => {
         setDeleteId(id);
         setOpen(true);
-    }
+    };
 
     const onSetCreateModal = (action: boolean) => {
         setCreateModal(action);
-    }
+    };
 
-    const handleUpdate = ({ password, passwordConfirmation, ...data }: any) => {
+    const handleUpdate = (data: any) => {
         setHiddeButton(false);
         setCreateModal(true);
         setDeleteId(data.id);
-        setValues({ ...data, password: "", passwordConfirmation: "" });
-    }
+        const matchedRole = roles.find(r => r.type === data.rol);
+        setValues({
+            fullName: data.fullName ?? '',
+            email: data.email ?? '',
+            imagen: data.imagen ?? '',
+            password: '',
+            passwordConfirmation: '',
+            rol: matchedRole?.id ?? '',
+        });
+    };
 
     const cancelUpdate = () => {
         setHiddeButton(true);
         resetForm();
-    }
+    };
 
-    const saveUpdate = () => {
+    const saveUpdate = async () => {
+        const payload: any = {
+            fullName: values.fullName,
+            email: values.email,
+            imagen: values.imagen,
+            rol: Number(values.rol),
+        };
+        if (values.password) payload.password = values.password;
 
-        const dataUpdate = {
-            id: deleteId,
-            isActive: true,
-            ...values
-        }
-        const { passwordConfirmation, ...updateValues } = dataUpdate;
-
-        updateUser(updateValues);
+        await updateUser(deleteId, payload);
+        await getUsers(page, rowsPerPage, filter);
         enqueueSnackbar('Usuario actualizado exitosamente', { variant: 'success' });
         resetForm();
+    };
 
-        setTimeout(() => {
-            getUsers(skip, rowsPerPage, {});
-        }, 1000)
-
-    }
-
-    const onClose = (action: boolean) => {
+    const onClose = async (action: boolean) => {
         setOpen(false);
         if (action) {
-            deleteUser(deleteId);
+            await deleteUser(deleteId);
             enqueueSnackbar('Usuario eliminado exitosamente', { variant: 'success' });
         }
-    }
+    };
 
-    const handleActive = (id: number, status: boolean) => {
-        changeStatus(id, status);
-        enqueueSnackbar('El estado usuario actualizado exitosamente', { variant: 'success' });
+    const handleActive = async (id: number, status: boolean) => {
+        await changeStatus(id, status);
+        enqueueSnackbar('Estado del usuario actualizado exitosamente', { variant: 'success' });
+    };
 
-        setTimeout(() => {
-            getUsers(skip, rowsPerPage, filter);
-        }, 1000)
-    }
-
-
-    const handleFilter = (fullname: string, email: string) => {
-        setFilter({ fullname, email });
-        setSkip(0);
-        setRowsPerPage(10);
-    }
-
+    const handleFilter = (fullName: string, email: string) => {
+        const newFilter = { fullName, email };
+        setFilter(newFilter);
+        setPage(0);
+    };
 
     const {
         handleSubmit,
@@ -129,40 +111,50 @@ export const useUser = () => {
         handleChange,
         setValues,
         resetForm,
+        setFieldValue,
     } = useFormik({
         initialValues: {
-            userName: '',
             fullName: '',
             email: '',
-            avatar: '',
+            imagen: '',
             password: '',
             passwordConfirmation: '',
+            rol: '' as any,
         },
-        onSubmit: ({ fullName, userName, email, avatar, password }, { resetForm }) => {
-            createUser({ userName, fullName, email, avatar, password });
+        onSubmit: async ({ fullName, email, imagen, password, rol }, { resetForm }) => {
+            await createUser({ fullName, email, imagen, password, rol: Number(rol) });
+            await getUsers(0, rowsPerPage, filter);
+            setPage(0);
             enqueueSnackbar('Usuario creado exitosamente', { variant: 'success' });
             resetForm();
         },
         validationSchema: Yup.object({
-            userName: Yup.string().max(15, 'Debe de tener 15 caracteres o menos').required('Requerido'),
-            fullName: Yup.string().min(10).max(30, 'Debe de tener minimo 10  y maximo 30 caracteres').required('Requerido'),
-            email: Yup.string().email('debe ser un email valido').required('Requerido'),
-            avatar: Yup.string().max(10, 'Ingrese imagen'),
-            password: Yup.string().min(6, 'La contraseña debe tener más de 6 caracteres').max(30, 'la contraseña tiene un largo maximo de 30 caracteres').required().notOneOf(['it-jr'], 'Esta opción no es permitida'),
-            passwordConfirmation: Yup.string().min(6, 'La contraseña debe tener más de 6 caracteres').max(30, 'la contraseña tiene un largo maximo de 30 caracteres').oneOf([Yup.ref('password')], 'La contraseñas no son iguales')
-        })
+            fullName: Yup.string().min(3, 'Mínimo 3 caracteres').max(200, 'Máximo 200 caracteres').required('Requerido'),
+            email: Yup.string().email('Debe ser un email válido').required('Requerido'),
+            imagen: Yup.string().required('Requerido'),
+            password: Yup.string()
+                .required('Requerido')
+                .min(9, 'Mínimo 9 caracteres')
+                .max(30, 'Máximo 30 caracteres')
+                .test('letras', 'Debe contener al menos 4 letras', v => (v?.match(/[a-zA-Z]/g) ?? []).length >= 4)
+                .test('numeros', 'Debe contener al menos 4 números', v => (v?.match(/[0-9]/g) ?? []).length >= 4)
+                .test('simbolo', 'Debe contener al menos 1 símbolo (!@#$%^&*...)', v => /[^a-zA-Z0-9]/.test(v ?? '')),
+            passwordConfirmation: Yup.string()
+                .oneOf([Yup.ref('password')], 'Las contraseñas no coinciden')
+                .required('Requerido'),
+            rol: Yup.number().required('Requerido').typeError('Selecciona un rol'),
+        }),
     });
 
-
     useEffect(() => {
-        getUsers(skip, rowsPerPage, filter);
-        checkAuthStatus();
-
+        getUsers(page, rowsPerPage, filter);
     }, [page, rowsPerPage, filter]);
 
+    useEffect(() => {
+        UserService.getRoles().then(setRoles).catch(() => {});
+    }, []);
 
     return {
-        //Propierties
         users,
         page,
         open,
@@ -171,14 +163,14 @@ export const useUser = () => {
         errors,
         touched,
         rowsPerPage,
-        openDialog,
         createModal,
         showPassword,
         hiddeButton,
-        //Methods
+        roles,
         handleSubmit,
         handleChange,
         handleBlur,
+        setFieldValue,
         saveUpdate,
         handleActive,
         handleUpdate,
@@ -187,10 +179,8 @@ export const useUser = () => {
         handleChangePage,
         handleChangeRowsPerPage,
         onClose,
-        onCloseDialog,
         onSetCreateModal,
         handleDelete,
         handleFilter,
-
-    }
-}
+    };
+};

@@ -39,7 +39,7 @@ export const FilterUserForm = ({ onSetCreateModal, handleFilter }: any) => {
             component="form"
             onSubmit={handleSubmit}
             sx={{
-                bgcolor: '#FFF',
+                bgcolor: 'background.paper',
                 borderRadius: 2,
                 boxShadow: 10,
                 borderColor: '#ccc',

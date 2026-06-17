@@ -1,87 +1,66 @@
 import { devtools } from "zustand/middleware";
 import { UserService } from "../../services/user.service";
 import { StateCreator, create } from "zustand";
-import { Users, userBody } from "../../interfaces";
-import { immer } from "zustand/middleware/immer";
+import { Users, UserBody, UserFilter } from "../../interfaces";
 
 export interface UserState {
     users: Users[];
     count: number;
-    getUsers: (skip: number, take: number, { }: any) => Promise<void>;
-    createUser: (user: userBody) => Promise<void>;
-    deleteUser: (id: number) => void;
-    changeStatus: (id: number, status: boolean) => void;
-    updateUser: (user: Users) => void;
-
+    getUsers: (page: number, limit: number, filter: UserFilter) => Promise<void>;
+    createUser: (user: UserBody) => Promise<void>;
+    deleteUser: (id: number) => Promise<void>;
+    changeStatus: (id: number, status: boolean) => Promise<void>;
+    updateUser: (id: number, user: Partial<UserBody>) => Promise<void>;
 }
 
-const storeApi: StateCreator<UserState, [["zustand/devtools", never], ["zustand/immer", never]]> = (set) => ({
+const storeApi: StateCreator<UserState, [["zustand/devtools", never]]> = (set) => ({
     users: [],
     count: 0,
-    getUsers: async (skip, take, filter) => {
+    getUsers: async (page, limit, filter) => {
         try {
-            const { users, count } = await UserService.getUsers({ skip, take }, filter);
-            set({ users, count });
-        } catch (error) {
-            set({ users: undefined, count: 0 })
-
+            const { data, total } = await UserService.getUsers({ page: page + 1, limit }, filter);
+            set({ users: data, count: total });
+        } catch {
+            set({ users: [], count: 0 });
         }
     },
     createUser: async (user) => {
         try {
-            const data = await UserService.createrUser(user);
-            set(state => ({
-                users: [data, ...state.users],
-                count: state.count + 1
-            }));
+            await UserService.createUser(user);
         } catch (error) {
             console.log(error);
         }
     },
     deleteUser: async (id) => {
         try {
-            const { success } = await UserService.deleleUser(id);
-
-            if (success) {
-                set(state => ({
-                    users: state.users.filter(user => user.id != id)
-                }));
-            }
+            await UserService.deleteUser(id);
+            set(state => ({
+                users: state.users.filter(u => u.id !== id),
+                count: state.count - 1,
+            }));
         } catch (error) {
             console.log(error);
         }
     },
     changeStatus: async (id, status) => {
-
-
         try {
-            const data = await UserService.changeStatus(id, status);
-
-            console.log(data);
+            await UserService.changeStatus(id, status);
+            set(state => ({
+                users: state.users.map(u => u.id === id ? { ...u, isActive: status } : u),
+            }));
         } catch (error) {
-            console.log(error)
+            console.log(error);
         }
-
     },
-    updateUser: async (userData) => {
-
-        const { id, ...user } = userData;
-
+    updateUser: async (id, user) => {
         try {
-            const data = await UserService.updateUser(id, user);
-
-            console.log(data);
+            await UserService.updateUser(id, user);
         } catch (error) {
-            console.log(error)
+            console.log(error);
         }
-    }
-})
-
+    },
+});
 
 export const useUserStore = create<UserState>()(
-    devtools(
-        immer(
-            storeApi
-        )
-    )
-)
+    devtools(storeApi)
+);

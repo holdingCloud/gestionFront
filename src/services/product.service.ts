@@ -6,11 +6,11 @@ import { ProductResponse, ProductBody, pagination, CreateProductResponse } from 
 export class ProductService {
 
 
-    static getProducts = async ({ skip, take }: pagination): Promise<ProductResponse> => {
+    static getProducts = async ({ page, limit }: pagination): Promise<ProductResponse> => {
 
         const queryParams = {
-            skip,
-            take,
+            page,
+            limit,
             name: ""
         }
 
