@@ -3,10 +3,18 @@ import { useSnackbar } from 'notistack';
 import { useFormik } from "formik";
 import * as Yup from 'yup';
 import { useClientStore, useCompanyStore } from "../../../store";
+import { ClientService } from "../../../services";
+
+interface FilterParams {
+    search?: string;
+    contactStatus?: string;
+    communeId?: number;
+}
 
 export const useClient = () => {
 
     const allClients = useClientStore(state => state.clients);
+    const count = useClientStore(state => state.count);
     const loading = useClientStore(state => state.loading);
     const getClients = useClientStore(state => state.getClients);
     const createClient = useClientStore(state => state.createClient);
@@ -24,13 +32,46 @@ export const useClient = () => {
     const [open, setOpen] = useState<boolean>(false);
     const [deleteId, setDeleteId] = useState<number>(0);
     const [hiddeButton, setHiddeButton] = useState(true);
-    const [nameFilter, setNameFilter] = useState('');
-    const [communeFilter, setCommuneFilter] = useState('');
-    const [addressFilter, setAddressFilter] = useState('');
-    const [statusFilter, setStatusFilter] = useState('');
     const [purchasesOpen, setPurchasesOpen] = useState(false);
     const [dialogClientId, setDialogClientId] = useState<number>(0);
     const [dialogClientName, setDialogClientName] = useState<string>('');
+
+    // Server-side filter state
+    const [searchFilter, setSearchFilter] = useState('');
+    const [statusFilter, setStatusFilter] = useState('');
+    const [communeIdFilter, setCommuneIdFilter] = useState<number | undefined>(undefined);
+
+    // Global counts (unfiltered, for stat cards)
+    const [stats, setStats] = useState({ total: 0, porLlamar: 0, vencidos: 0, contactados: 0 });
+
+    const doFetch = async (pg: number, limit: number, filters: FilterParams) => {
+        await getClients({
+            page: pg + 1,
+            limit,
+            search: filters.search || undefined,
+            contactStatus: filters.contactStatus || undefined,
+            communeId: filters.communeId,
+        });
+    };
+
+    const fetchStats = async () => {
+        try {
+            const [all, llamar, vencido, contactado] = await Promise.all([
+                ClientService.getClients({ page: 1, limit: 1 }),
+                ClientService.getClients({ page: 1, limit: 1, contactStatus: 'LLAMAR' }),
+                ClientService.getClients({ page: 1, limit: 1, contactStatus: 'VENCIDO' }),
+                ClientService.getClients({ page: 1, limit: 1, contactStatus: 'CONTACTADO' }),
+            ]);
+            setStats({
+                total: all.total,
+                porLlamar: llamar.total,
+                vencidos: vencido.total,
+                contactados: contactado.total,
+            });
+        } catch {
+            // ignore
+        }
+    };
 
     const handleChangePage = (
         event: MouseEvent<HTMLButtonElement> | null,
@@ -38,13 +79,16 @@ export const useClient = () => {
     ) => {
         event?.preventDefault();
         setPage(newPage);
+        doFetch(newPage, rowsPerPage, { search: searchFilter, contactStatus: statusFilter, communeId: communeIdFilter });
     };
 
     const handleChangeRowsPerPage = (
         event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     ) => {
-        setRowsPerPage(parseInt(event.target.value, 10));
+        const newLimit = parseInt(event.target.value, 10);
+        setRowsPerPage(newLimit);
         setPage(0);
+        doFetch(0, newLimit, { search: searchFilter, contactStatus: statusFilter, communeId: communeIdFilter });
     };
 
     const handleDelete = (id: number) => {
@@ -78,55 +122,39 @@ export const useClient = () => {
         resetForm();
     };
 
-    const saveUpdate = () => {
+    const saveUpdate = async () => {
         const dataUpdate = { id: deleteId, ...values };
-        updateClient(dataUpdate as any);
+        await updateClient(dataUpdate as any);
+        await doFetch(page, rowsPerPage, { search: searchFilter, contactStatus: statusFilter, communeId: communeIdFilter });
+        await fetchStats();
         enqueueSnackbar('Cliente actualizado exitosamente', { variant: 'success' });
         resetForm();
     };
 
-    const onClose = (action: boolean) => {
+    const onClose = async (action: boolean) => {
         setOpen(false);
         if (action) {
-            deleteClient(deleteId);
+            await deleteClient(deleteId);
+            const newPage = allClients.length === 1 && page > 0 ? page - 1 : page;
+            setPage(newPage);
+            await doFetch(newPage, rowsPerPage, { search: searchFilter, contactStatus: statusFilter, communeId: communeIdFilter });
+            await fetchStats();
             enqueueSnackbar('Cliente eliminado exitosamente', { variant: 'success' });
         }
     };
 
-    const handleFilter = ({ name, commune, address, status }: { name: string; commune: string; address: string; status: string }) => {
-        setNameFilter(name);
-        setCommuneFilter(commune);
-        setAddressFilter(address);
+    const handleFilter = ({ name, communeId, status }: { name: string; communeId: number | undefined; status: string }) => {
+        setSearchFilter(name);
+        setCommuneIdFilter(communeId);
         setStatusFilter(status);
         setPage(0);
+        doFetch(0, rowsPerPage, { search: name, contactStatus: status, communeId });
     };
 
     const handlePurchases = (id: number, name: string) => {
         setDialogClientId(id);
         setDialogClientName(name);
         setPurchasesOpen(true);
-    };
-
-    const safeClients = Array.isArray(allClients) ? allClients : [];
-
-    const filteredClients = safeClients.filter(c => {
-        const matchName    = !nameFilter    || (c.fullname ?? '').toLowerCase().includes(nameFilter.toLowerCase());
-        const matchCommune = !communeFilter || (c.commune?.name ?? '').toLowerCase().includes(communeFilter.toLowerCase());
-        const matchAddress = !addressFilter || (c.address ?? '').toLowerCase().includes(addressFilter.toLowerCase());
-        const matchStatus  = !statusFilter  || c.contactStatus === statusFilter;
-        return matchName && matchCommune && matchAddress && matchStatus;
-    });
-
-    const paginatedClients = filteredClients.slice(
-        page * rowsPerPage,
-        page * rowsPerPage + rowsPerPage
-    );
-
-    const stats = {
-        total: safeClients.length,
-        porLlamar: safeClients.filter(c => c.contactStatus === 'LLAMAR').length,
-        vencidos: safeClients.filter(c => c.contactStatus === 'VENCIDO').length,
-        contactados: safeClients.filter(c => c.contactStatus === 'CONTACTADO').length,
     };
 
     const {
@@ -151,11 +179,11 @@ export const useClient = () => {
             frequency: '' as any,
             companyId: '' as any,
         },
-        onSubmit: ({ fullname, email, phone, address, n_depto_casa, referencia, communeId, frequency, companyId }, { resetForm }) => {
+        onSubmit: async ({ fullname, email, phone, address, n_depto_casa, referencia, communeId, frequency, companyId }, { resetForm }) => {
             const freq = frequency !== '' && frequency !== undefined ? Number(frequency) : undefined;
             const cid = communeId !== '' && communeId !== undefined ? Number(communeId) : undefined;
             const compId = companyId !== '' && companyId !== undefined ? Number(companyId) : undefined;
-            createClient({
+            await createClient({
                 fullname, email, phone, address,
                 ...(n_depto_casa ? { n_depto_casa } : {}),
                 ...(referencia ? { referencia } : {}),
@@ -163,6 +191,9 @@ export const useClient = () => {
                 ...(freq ? { frequency: freq } : {}),
                 ...(compId ? { companyId: compId } : {}),
             });
+            setPage(0);
+            await doFetch(0, rowsPerPage, { search: searchFilter, contactStatus: statusFilter, communeId: communeIdFilter });
+            await fetchStats();
             enqueueSnackbar('Cliente creado exitosamente', { variant: 'success' });
             resetForm();
         },
@@ -177,17 +208,19 @@ export const useClient = () => {
     });
 
     useEffect(() => {
-        getClients();
+        doFetch(0, rowsPerPage, {});
         getCompanies();
+        fetchStats();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return {
-        clients: paginatedClients,
+        clients: allClients,
         loading,
         page,
         open,
         values,
-        count: filteredClients.length,
+        count,
         stats,
         errors,
         touched,

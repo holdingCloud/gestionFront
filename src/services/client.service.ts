@@ -4,9 +4,18 @@ import { ClientBody, ClientFrequency, ClientPaginatedResponse, ClientPurchase, C
 
 export class ClientService {
 
-    static getClients = async (page = 1, limit = 1000): Promise<ClientPaginatedResponse> => {
+    static getClients = async (params?: {
+        page?: number;
+        limit?: number;
+        search?: string;
+        contactStatus?: string;
+        communeId?: number;
+    }): Promise<ClientPaginatedResponse> => {
         try {
-            const { data } = await gestionApi.get<ClientPaginatedResponse>(`/clients/?page=${page}&limit=${limit}`);
+            const { page = 1, limit = 20, ...filters } = params ?? {};
+            const { data } = await gestionApi.get<ClientPaginatedResponse>('/clients/', {
+                params: { page, limit, ...filters },
+            });
             return data;
         } catch (error: unknown) {
             if (error instanceof AxiosError) {

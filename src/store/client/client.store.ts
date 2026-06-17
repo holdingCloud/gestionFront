@@ -3,13 +3,21 @@ import { ClientService } from "../../services";
 import type { Client, ClientBody, ClientResponse } from "../../interfaces";
 import { StateCreator, create } from "zustand";
 
+export interface ClientFetchParams {
+    page?: number;
+    limit?: number;
+    search?: string;
+    contactStatus?: string;
+    communeId?: number;
+}
+
 export interface ClientState {
     clients: Client[];
     count: number;
     error: boolean;
     loading: boolean;
     porLlamarCount: number;
-    getClients: () => Promise<void>;
+    getClients: (params?: ClientFetchParams) => Promise<void>;
     createClient: (client: ClientBody) => Promise<void>;
     updateClient: (client: ClientResponse) => Promise<void>;
     deleteClient: (id: number) => Promise<void>;
@@ -24,10 +32,10 @@ const storeApi: StateCreator<ClientState> = (set, get) => ({
     error: false,
     loading: false,
     porLlamarCount: 0,
-    getClients: async () => {
+    getClients: async (params) => {
         set({ loading: true });
         try {
-            const { data, total } = await ClientService.getClients();
+            const { data, total } = await ClientService.getClients(params);
             set({ clients: data, count: total });
         } catch (error) {
             set({ error: true });
@@ -38,7 +46,6 @@ const storeApi: StateCreator<ClientState> = (set, get) => ({
     createClient: async (client) => {
         try {
             await ClientService.createClient(client);
-            await get().getClients();
         } catch (error) {
             console.log(error);
         }
@@ -47,7 +54,6 @@ const storeApi: StateCreator<ClientState> = (set, get) => ({
         const { id, createdAt, updatedAt, contactStatus, frequencies, clientProductFrequencies, commune, company, available, ...body } = clientData as any;
         try {
             await ClientService.updateClient(id, body);
-            await get().getClients();
         } catch (error) {
             console.log(error);
         }

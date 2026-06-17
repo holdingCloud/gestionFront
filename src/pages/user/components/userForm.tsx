@@ -1,6 +1,39 @@
-import { VisibilityOff, Visibility } from "@mui/icons-material"
-import { Grid, DialogContent, DialogContentText, TextField, InputAdornment, IconButton, DialogActions, Button } from "@mui/material"
+import { VisibilityOff, Visibility } from "@mui/icons-material";
+import {
+    Box,
+    DialogContent,
+    DialogActions,
+    Button,
+    TextField,
+    InputAdornment,
+    IconButton,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
+    FormHelperText,
+    Typography,
+    Divider,
+} from "@mui/material";
+import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
+import TuneOutlinedIcon from "@mui/icons-material/TuneOutlined";
+import { Role } from "../../../interfaces";
 
+const SectionLabel = ({ icon, label }: { icon: React.ReactNode; label: string }) => (
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 1.5, mt: 0.5 }}>
+        {icon}
+        <Typography variant="caption" fontWeight={700} color="text.secondary" letterSpacing={0.8} textTransform="uppercase">
+            {label}
+        </Typography>
+        <Divider sx={{ flex: 1 }} />
+    </Box>
+);
+
+const roleLabels: Record<string, string> = {
+    ADMINISTRADOR: 'Administrador',
+    REPARTIDOR: 'Repartidor',
+    COMUN: 'Común',
+};
 
 export const UserForm = ({
     onSetCreateModal,
@@ -9,104 +42,96 @@ export const UserForm = ({
     touched,
     handleChange,
     handleBlur,
+    setFieldValue,
     errors,
     showPassword,
     hiddeButton,
     handleClickShowPassword,
     saveUpdate,
-    cancelUpdate }: any) => {
-
-
-
+    cancelUpdate,
+    roles,
+}: any) => {
 
     return (
-        <Grid item={true} xs={12}
-            component="form"
-            onSubmit={handleSubmit}
-            sx={{
-                '& .MuiTextField-root': {
-                    m: 1,
-                    width: '25ch',
-                },
-                '& .MuiButton-root': {
-                    m: 1,
-                    width: '20ch',
-                },
-            }}
-            noValidate
-            autoComplete="off">
-            <DialogContent>
-                <DialogContentText>
+        <Box component="form" onSubmit={handleSubmit} noValidate autoComplete="off">
+            <DialogContent sx={{ pt: 2, pb: 1, px: 3 }}>
 
+                <SectionLabel icon={<PersonOutlineIcon fontSize="small" color="action" />} label="Datos del usuario" />
 
-                    <TextField
-                        fullWidth
-                        size="small"
-                        name="fullName"
-                        label="Nombre completo"
-                        value={values.fullName}
-                        onChange={handleChange}
+                <TextField
+                    fullWidth size="small" name="fullName" label="Nombre completo"
+                    value={values.fullName}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={touched.fullName && Boolean(errors.fullName)}
+                    helperText={touched.fullName && errors.fullName}
+                    sx={{ mb: 2 }}
+                />
+
+                <TextField
+                    fullWidth size="small" name="email" label="Email"
+                    value={values.email}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={touched.email && Boolean(errors.email)}
+                    helperText={touched.email && errors.email}
+                    sx={{ mb: 2 }}
+                />
+
+                <TextField
+                    fullWidth size="small" name="imagen" label="URL de imagen / avatar"
+                    value={values.imagen}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={touched.imagen && Boolean(errors.imagen)}
+                    helperText={(touched.imagen && errors.imagen) || 'URL de la foto de perfil'}
+                    sx={{ mb: 2 }}
+                />
+
+                <SectionLabel icon={<TuneOutlinedIcon fontSize="small" color="action" />} label="Acceso" />
+
+                <FormControl fullWidth size="small" sx={{ mb: 2 }} error={touched.rol && Boolean(errors.rol)}>
+                    <InputLabel>Rol</InputLabel>
+                    <Select
+                        name="rol"
+                        value={values.rol ?? ''}
+                        label="Rol"
+                        onChange={(e) => setFieldValue('rol', e.target.value)}
                         onBlur={handleBlur}
-                        error={touched.fullName && Boolean(errors.fullName)}
-                        helperText={touched.fullName && errors.fullName}
-                    />
+                    >
+                        {(roles as Role[])?.map(r => (
+                            <MenuItem key={r.id} value={r.id}>
+                                {roleLabels[r.type] ?? r.type}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                    {touched.rol && errors.rol && (
+                        <FormHelperText>{errors.rol as string}</FormHelperText>
+                    )}
+                </FormControl>
 
+                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
                     <TextField
-                        fullWidth
-                        size="small"
-                        name="email"
-                        label="Email"
-                        value={values.email}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        error={touched.email && Boolean(errors.email)}
-                        helperText={touched.email && errors.email}
-                    />
-
-                    <TextField
-                        fullWidth
-                        size="small"
-                        name="avatar"
-                        label="Avatar"
-                        value={values.avatar}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        error={touched.avatar && Boolean(errors.avatar)}
-                        helperText={touched.avatar && errors.avatar}
-                    />
-
-                    <TextField
-                        fullWidth
-                        size="small"
-                        name="password"
-                        label="Contraseña"
-                        type={showPassword ? "text" : "password"}
+                        fullWidth size="small" name="password" label="Contraseña"
+                        type={showPassword ? 'text' : 'password'}
                         value={values.password}
                         onChange={handleChange}
                         onBlur={handleBlur}
                         error={touched.password && Boolean(errors.password)}
-                        helperText={touched.password && errors.password}
+                        helperText={(touched.password && errors.password) || (hiddeButton ? '' : 'Dejar vacío para no cambiar')}
                         InputProps={{
                             endAdornment: (
                                 <InputAdornment position="end">
-                                    <IconButton
-                                        aria-label="toggle password visibility"
-                                        onClick={handleClickShowPassword}
-                                        edge="end"
-                                    >
+                                    <IconButton onClick={handleClickShowPassword} edge="end" size="small">
                                         {showPassword ? <VisibilityOff /> : <Visibility />}
                                     </IconButton>
                                 </InputAdornment>
                             ),
                         }}
                     />
-
                     <TextField
-                        fullWidth
-                        size="small"
-                        name="passwordConfirmation"
-                        label="Confirmar contraseña"
-                        type={showPassword ? "text" : "password"}
+                        fullWidth size="small" name="passwordConfirmation" label="Confirmar contraseña"
+                        type={showPassword ? 'text' : 'password'}
                         value={values.passwordConfirmation}
                         onChange={handleChange}
                         onBlur={handleBlur}
@@ -115,48 +140,26 @@ export const UserForm = ({
                         InputProps={{
                             endAdornment: (
                                 <InputAdornment position="end">
-                                    <IconButton
-                                        aria-label="toggle password visibility"
-                                        onClick={handleClickShowPassword}
-                                        edge="end"
-                                    >
+                                    <IconButton onClick={handleClickShowPassword} edge="end" size="small">
                                         {showPassword ? <VisibilityOff /> : <Visibility />}
                                     </IconButton>
                                 </InputAdornment>
                             ),
                         }}
                     />
+                </Box>
 
-
-                </DialogContentText>
             </DialogContent>
 
-
-
-            <DialogActions>
-                {hiddeButton ? <Button
-                    variant="contained"
-                    type="submit"
-                    color="primary">
-                    Guardar
-                </Button> :
-                    <Button
-                        variant="contained"
-                        type="button"
-                        color="info"
-                        onClick={saveUpdate}>
-                        Editar
-                    </Button>
-                }
-                <Button autoFocus variant="outlined" onClick={() => {
-                    onSetCreateModal(false)
-                    cancelUpdate()
-                }}>
+            <DialogActions sx={{ px: 3, pb: 2, pt: 1 }}>
+                <Button variant="outlined" onClick={() => { onSetCreateModal(false); cancelUpdate(); }}>
                     Cancelar
                 </Button>
-
+                {hiddeButton
+                    ? <Button variant="contained" type="submit" color="primary">Guardar</Button>
+                    : <Button variant="contained" type="button" color="info" onClick={saveUpdate}>Guardar cambios</Button>
+                }
             </DialogActions>
-
-        </Grid>
-    )
-}
+        </Box>
+    );
+};

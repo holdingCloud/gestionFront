@@ -1,7 +1,12 @@
 import { Grid, TextField, Button, Tooltip, MenuItem, Select, FormControl, InputLabel } from "@mui/material"
+import Autocomplete from "@mui/material/Autocomplete";
 import SearchIcon from '@mui/icons-material/Search';
 import SearchOffIcon from '@mui/icons-material/SearchOff';
 import { useFormik } from "formik";
+import { useEffect, useState } from "react";
+import { LocationService, Commune } from "../../../services";
+
+const VALPARAISO_NAME = 'Región de Valparaíso';
 
 const statusOptions = [
     { value: '', label: 'Todos' },
@@ -11,17 +16,30 @@ const statusOptions = [
 ];
 
 export const FilterClientForm = ({ onSetCreateModal, handleFilter }: any) => {
+    const [communes, setCommunes] = useState<Commune[]>([]);
+    const [selectedCommune, setSelectedCommune] = useState<Commune | null>(null);
+
+    useEffect(() => {
+        LocationService.getRegions()
+            .then(regions => {
+                const valp = regions.find(r => r.name === VALPARAISO_NAME);
+                return valp ? LocationService.getCommunesByRegion(valp.id) : [];
+            })
+            .then(setCommunes)
+            .catch(() => {});
+    }, []);
 
     const { handleSubmit, values, handleChange, resetForm, setFieldValue } = useFormik({
-        initialValues: { name: '', commune: '', address: '', status: '' },
-        onSubmit: ({ name, commune, address, status }) => {
-            handleFilter({ name, commune, address, status });
+        initialValues: { name: '', communeId: undefined as number | undefined, status: '' },
+        onSubmit: ({ name, communeId, status }) => {
+            handleFilter({ name, communeId, status });
         },
     });
 
     const handleClear = () => {
         resetForm();
-        handleFilter({ name: '', commune: '', address: '', status: '' });
+        setSelectedCommune(null);
+        handleFilter({ name: '', communeId: undefined, status: '' });
     };
 
     return (
@@ -52,22 +70,20 @@ export const FilterClientForm = ({ onSetCreateModal, handleFilter }: any) => {
                 sx={{ flexGrow: 1, minWidth: 150, m: 0.5 }}
             />
 
-            <TextField
+            <Autocomplete
                 size="small"
-                name="commune"
-                label="Comuna"
-                value={values.commune}
-                onChange={handleChange}
-                sx={{ flexGrow: 1, minWidth: 150, m: 0.5 }}
-            />
-
-            <TextField
-                size="small"
-                name="address"
-                label="Dirección"
-                value={values.address}
-                onChange={handleChange}
-                sx={{ flexGrow: 1, minWidth: 150, m: 0.5 }}
+                options={communes}
+                getOptionLabel={(o) => o.name}
+                value={selectedCommune}
+                isOptionEqualToValue={(o, v) => o.id === v.id}
+                onChange={(_, newVal) => {
+                    setSelectedCommune(newVal);
+                    setFieldValue('communeId', newVal?.id ?? undefined);
+                }}
+                renderInput={(params) => (
+                    <TextField {...params} label="Comuna" />
+                )}
+                sx={{ flexGrow: 1, minWidth: 180, m: 0.5 }}
             />
 
             <FormControl size="small" sx={{ minWidth: 160, m: 0.5 }}>

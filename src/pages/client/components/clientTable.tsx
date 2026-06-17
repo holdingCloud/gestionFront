@@ -1,6 +1,7 @@
 import { EditOutlined, DeleteForeverOutlined } from "@mui/icons-material"
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
-import { Box, CircularProgress, Grid, TableHead, TableRow, TableCell, TableBody, Tooltip, ButtonGroup, Button, Chip, IconButton, Typography } from "@mui/material"
+import WhatsAppIcon from '@mui/icons-material/WhatsApp';
+import { Box, CircularProgress, Grid, Link, TableHead, TableRow, TableCell, TableBody, Tooltip, ButtonGroup, Button, Chip, IconButton, Typography } from "@mui/material"
 import { DataTable } from "../../../components"
 
 const statusColor: Record<string, 'warning' | 'error' | 'success' | 'default'> = {
@@ -10,6 +11,20 @@ const statusColor: Record<string, 'warning' | 'error' | 'success' | 'default'> =
 };
 
 const cellSx = { px: 1, py: 0.75 };
+
+function formatPhone(phone: string): string {
+    const trimmed = phone.trim();
+    if (trimmed.startsWith('+56')) return trimmed;
+    const digits = trimmed.replace(/\D/g, '');
+    if (digits.startsWith('56')) return `+${digits}`;
+    return `+56${digits}`;
+}
+
+function buildWhatsAppUrl(phone: string): string {
+    const digits = phone.replace(/\D/g, '');
+    const number = digits.startsWith('56') ? digits : `56${digits}`;
+    return `https://wa.me/${number}`;
+}
 
 function formatDate(iso: string | null): string {
     if (!iso) return '-';
@@ -115,7 +130,24 @@ export const ClientTable = ({
                                     </Typography>
                                 </TableCell>
                                 <TableCell sx={cellSx}>
-                                    <Typography variant="body2" noWrap sx={{ maxWidth: 130 }}>{row.phone}</Typography>
+                                    {row.phone ? (
+                                        <Tooltip title={`Abrir WhatsApp`}>
+                                            <Link
+                                                href={buildWhatsAppUrl(row.phone)}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                underline="hover"
+                                                sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: '#25D366', width: 'fit-content' }}
+                                            >
+                                                <WhatsAppIcon fontSize="small" />
+                                                <Typography variant="body2" noWrap sx={{ maxWidth: 130 }}>
+                                                    {formatPhone(row.phone)}
+                                                </Typography>
+                                            </Link>
+                                        </Tooltip>
+                                    ) : (
+                                        <Typography variant="body2" color="text.disabled">-</Typography>
+                                    )}
                                 </TableCell>
                                 <TableCell component="th" scope="row" sx={cellSx}>
                                     <Typography variant="body2" noWrap sx={{ maxWidth: 140 }}>{row.fullname}</Typography>
