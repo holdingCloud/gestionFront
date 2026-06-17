@@ -13,7 +13,7 @@ export interface CompanyState {
     deleteCompany: (id: number) => Promise<void>;
 }
 
-const storeApi: StateCreator<CompanyState, [["zustand/devtools", never], ["zustand/immer", never]]> = (set, get) => ({
+const storeApi: StateCreator<CompanyState, [["zustand/devtools", never], ["zustand/immer", never]]> = (set) => ({
     companies: [],
     loading: false,
     getCompanies: async () => {

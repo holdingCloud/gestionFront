@@ -19,7 +19,7 @@ export const CompanySelect = ({ value, onChange }: Props) => {
         <FormControl fullWidth size="small">
             <InputLabel>Empresa</InputLabel>
             <Select
-                value={value ?? ''}
+                value={value != null ? String(value) : ''}
                 onChange={(e: SelectChangeEvent) => {
                     const v = e.target.value;
                     onChange(v === '' ? undefined : Number(v));
@@ -28,7 +28,7 @@ export const CompanySelect = ({ value, onChange }: Props) => {
             >
                 <MenuItem value="">Todas</MenuItem>
                 {companies.map(c => (
-                    <MenuItem key={c.id} value={c.id}>{c.name}</MenuItem>
+                    <MenuItem key={c.id} value={String(c.id)}>{c.name}</MenuItem>
                 ))}
             </Select>
         </FormControl>
