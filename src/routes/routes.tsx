@@ -148,6 +148,13 @@ export const routes: Route[] = [
         icon: <SupervisorAccountOutlinedIcon />
     },
     {
+        to: 'client',
+        //path: 'inventory/*',
+        //Component: lazy(() => import(/* webpackChunkName: "Products" */'../pages/invetory/InventoryPage')),
+        name: 'Clientes',
+        icon: <RecentActorsIcon />
+    },
+    {
         to: 'employee',
         name: 'Empleados',
         icon: <SupervisedUserCircleIcon />
@@ -165,13 +172,6 @@ export const routes: Route[] = [
         //Component: lazy(() => import(/* webpackChunkName: "Products" */'../pages/invetory/InventoryPage')),
         name: 'Compras',
         icon: <ShoppingBasketIcon />
-    },
-    {
-        to: 'client',
-        //path: 'inventory/*',
-        //Component: lazy(() => import(/* webpackChunkName: "Products" */'../pages/invetory/InventoryPage')),
-        name: 'Clientes',
-        icon: <RecentActorsIcon />
     },
     {
         to: 'provider',

@@ -30,16 +30,16 @@ export const FilterClientForm = ({ onSetCreateModal, handleFilter }: any) => {
     }, []);
 
     const { handleSubmit, values, handleChange, resetForm, setFieldValue } = useFormik({
-        initialValues: { name: '', communeId: undefined as number | undefined, status: '' },
-        onSubmit: ({ name, communeId, status }) => {
-            handleFilter({ name, communeId, status });
+        initialValues: { name: '', address: '', communeId: undefined as number | undefined, status: '' },
+        onSubmit: ({ name, address, communeId, status }) => {
+            handleFilter({ name, address, communeId, status });
         },
     });
 
     const handleClear = () => {
         resetForm();
         setSelectedCommune(null);
-        handleFilter({ name: '', communeId: undefined, status: '' });
+        handleFilter({ name: '', address: '', communeId: undefined, status: '' });
     };
 
     return (
@@ -66,6 +66,15 @@ export const FilterClientForm = ({ onSetCreateModal, handleFilter }: any) => {
                 name="name"
                 label="Nombre"
                 value={values.name}
+                onChange={handleChange}
+                sx={{ flexGrow: 1, minWidth: 150, m: 0.5 }}
+            />
+
+            <TextField
+                size="small"
+                name="address"
+                label="Dirección"
+                value={values.address}
                 onChange={handleChange}
                 sx={{ flexGrow: 1, minWidth: 150, m: 0.5 }}
             />

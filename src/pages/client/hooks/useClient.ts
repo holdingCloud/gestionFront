@@ -143,12 +143,13 @@ export const useClient = () => {
         }
     };
 
-    const handleFilter = ({ name, communeId, status }: { name: string; communeId: number | undefined; status: string }) => {
-        setSearchFilter(name);
+    const handleFilter = ({ name, address, communeId, status }: { name: string; address: string; communeId: number | undefined; status: string }) => {
+        const search = address.trim() || name.trim();
+        setSearchFilter(search);
         setCommuneIdFilter(communeId);
         setStatusFilter(status);
         setPage(0);
-        doFetch(0, rowsPerPage, { search: name, contactStatus: status, communeId });
+        doFetch(0, rowsPerPage, { search, contactStatus: status, communeId });
     };
 
     const handlePurchases = (id: number, name: string) => {
