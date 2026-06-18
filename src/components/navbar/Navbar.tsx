@@ -210,10 +210,15 @@ export const Navbar = () => {
                         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                         slotProps={{ paper: { elevation: 4, sx: { mt: 1, minWidth: 180, borderRadius: 2 } } }}
                     >
-                        <MenuItem disabled sx={{ opacity: '1 !important' }}>
-                            <Typography variant="body2" color="text.secondary" noWrap>
-                                {user?.fullName ?? user?.userName ?? 'Usuario'}
+                        <MenuItem disabled sx={{ opacity: '1 !important', flexDirection: 'column', alignItems: 'flex-start' }}>
+                            <Typography variant="body2" fontWeight={600} noWrap>
+                                {user?.fullName || user?.userName || 'Usuario'}
                             </Typography>
+                            {user?.email && (
+                                <Typography variant="caption" color="text.secondary" noWrap>
+                                    {user.email}
+                                </Typography>
+                            )}
                         </MenuItem>
                         <Divider />
                         <MenuItem onClick={() => { handleMenuClose(); navigate('/dashboard/profile'); }}>
