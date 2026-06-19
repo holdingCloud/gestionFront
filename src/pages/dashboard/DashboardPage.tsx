@@ -1,4 +1,4 @@
-import { Box, CircularProgress, Skeleton, Typography } from '@mui/material';
+import { Box, CircularProgress, Typography } from '@mui/material';
 import dayjs from 'dayjs';
 import { useDashboard } from './hooks/useDashboard';
 import { DashboardKpiCards } from './components/DashboardKpiCards';
