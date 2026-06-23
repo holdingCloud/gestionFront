@@ -27,6 +27,7 @@ export const useUser = () => {
     const [deleteId, setDeleteId] = useState(0);
     const [hiddeButton, setHiddeButton] = useState(true);
     const [filter, setFilter] = useState<UserFilter>({ fullName: '', email: '' });
+    const [isSavingUpdate, setIsSavingUpdate] = useState(false);
 
     const handleClickShowPassword = () => setShowPassword(prev => !prev);
 
@@ -69,18 +70,23 @@ export const useUser = () => {
     };
 
     const saveUpdate = async () => {
-        const payload: any = {
-            fullName: values.fullName,
-            email: values.email,
-            imagen: values.imagen,
-            rol: Number(values.rol),
-        };
-        if (values.password) payload.password = values.password;
+        setIsSavingUpdate(true);
+        try {
+            const payload: any = {
+                fullName: values.fullName,
+                email: values.email,
+                imagen: values.imagen,
+                rol: Number(values.rol),
+            };
+            if (values.password) payload.password = values.password;
 
-        await updateUser(deleteId, payload);
-        await getUsers(page, rowsPerPage, filter);
-        enqueueSnackbar('Usuario actualizado exitosamente', { variant: 'success' });
-        resetForm();
+            await updateUser(deleteId, payload);
+            await getUsers(page, rowsPerPage, filter);
+            enqueueSnackbar('Usuario actualizado exitosamente', { variant: 'success' });
+            resetForm();
+        } finally {
+            setIsSavingUpdate(false);
+        }
     };
 
     const onClose = async (action: boolean) => {
@@ -112,6 +118,7 @@ export const useUser = () => {
         setValues,
         resetForm,
         setFieldValue,
+        isSubmitting,
     } = useFormik({
         initialValues: {
             fullName: '',
@@ -144,6 +151,8 @@ export const useUser = () => {
                 .required('Requerido'),
             rol: Yup.number().required('Requerido').typeError('Selecciona un rol'),
         }),
+        validateOnChange: false,
+        validateOnBlur: true,
     });
 
     useEffect(() => {
@@ -167,6 +176,7 @@ export const useUser = () => {
         showPassword,
         hiddeButton,
         roles,
+        isSaving: isSubmitting || isSavingUpdate,
         handleSubmit,
         handleChange,
         handleBlur,

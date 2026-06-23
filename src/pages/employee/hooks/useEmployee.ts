@@ -56,11 +56,7 @@ export const useEmployee = () => {
         //updateEmployee(dataUpdate);
         enqueueSnackbar('Usuario actualizado exitosamente', { variant: 'success' });
         resetForm();
-
-        setTimeout(() => {
-            getEmployees(page, rowsPerPage, {});
-        }, 1000)
-
+        getEmployees(page, rowsPerPage, {});
     }
 
     const handleUpdate = ({ ...data }: any) => {
@@ -73,9 +69,6 @@ export const useEmployee = () => {
     const handleActive = (_id: number, _status: boolean) => {
         //changeStatus(id, status);
         enqueueSnackbar('El estado usuario actualizado exitosamente', { variant: 'success' });
-        setTimeout(() => {
-            //getUsers(skip, rowsPerPage, filter);
-        }, 1000)
     }
 
     const handleDelete = (id: number) => {
@@ -135,7 +128,9 @@ export const useEmployee = () => {
             city: Yup.string().min(10).max(30, 'Debe de tener minimo 10  y maximo 30 caracteres').required('Requerido'),
             address: Yup.string().min(10).max(50, 'Debe ingresar la dirección').required('Requerido'),
             type: Yup.string().required('Seleccione una opción'),
-        })
+        }),
+        validateOnChange: false,
+        validateOnBlur: true,
     });
 
 

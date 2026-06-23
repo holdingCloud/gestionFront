@@ -260,7 +260,7 @@ export const ClientPurchasesDialog = ({ open, clientId, clientName, onClose, onR
                                 disabled={saving || hasPending}
                                 sx={{ alignSelf: 'center', height: 40 }}
                             >
-                                Registrar compra
+                                {saving ? 'Guardando registro...' : 'Registrar compra'}
                             </Button>
 
                         </Box>

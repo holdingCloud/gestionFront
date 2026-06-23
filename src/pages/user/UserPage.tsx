@@ -53,6 +53,7 @@ const UserPage = () => {
         onSetCreateModal,
         handleDelete,
         handleFilter,
+        isSaving,
     } = useUser();
 
     return (
@@ -130,6 +131,7 @@ const UserPage = () => {
                         saveUpdate={saveUpdate}
                         cancelUpdate={cancelUpdate}
                         roles={roles}
+                        isSaving={isSaving}
                     />
                 </CreateModal>
             </TabPanel>

@@ -14,6 +14,7 @@ import {
     FormHelperText,
     Typography,
     Divider,
+    CircularProgress,
 } from "@mui/material";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import TuneOutlinedIcon from "@mui/icons-material/TuneOutlined";
@@ -44,6 +45,7 @@ export const UserForm = ({
     saveUpdate,
     cancelUpdate,
     roles,
+    isSaving,
 }: any) => {
 
     return (
@@ -146,12 +148,23 @@ export const UserForm = ({
             </DialogContent>
 
             <DialogActions sx={{ px: 3, pb: 2, pt: 1 }}>
-                <Button variant="outlined" onClick={() => { onSetCreateModal(false); cancelUpdate(); }}>
+                <Button variant="outlined" onClick={() => { onSetCreateModal(false); cancelUpdate(); }} disabled={isSaving}>
                     Cancelar
                 </Button>
                 {hiddeButton
-                    ? <Button variant="contained" type="submit" color="primary">Guardar</Button>
-                    : <Button variant="contained" type="button" color="info" onClick={saveUpdate}>Guardar cambios</Button>
+                    ? (
+                        <Button variant="contained" type="submit" color="primary" disabled={isSaving}
+                            startIcon={isSaving ? <CircularProgress size={16} color="inherit" /> : undefined}
+                        >
+                            {isSaving ? 'Guardando registro...' : 'Guardar'}
+                        </Button>
+                    ) : (
+                        <Button variant="contained" type="button" color="info" onClick={saveUpdate} disabled={isSaving}
+                            startIcon={isSaving ? <CircularProgress size={16} color="inherit" /> : undefined}
+                        >
+                            {isSaving ? 'Guardando registro...' : 'Guardar cambios'}
+                        </Button>
+                    )
                 }
             </DialogActions>
         </Box>

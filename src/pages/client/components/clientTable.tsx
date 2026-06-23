@@ -169,14 +169,14 @@ export const ClientTable = ({
                                             {getInitials(row.fullname)}
                                         </Avatar>
                                         <Box sx={{ minWidth: 0 }}>
-                                            <Typography variant="body2" fontWeight={600} noWrap sx={{ lineHeight: 1.3 }}>
-                                                {row.fullname}
-                                            </Typography>
                                             {subtitle && (
-                                                <Typography variant="caption" color="text.secondary" noWrap sx={{ display: 'block', lineHeight: 1.3 }}>
+                                                <Typography variant="body2" fontWeight={600} color="text.primary" noWrap sx={{ lineHeight: 1.3 }}>
                                                     {subtitle}
                                                 </Typography>
                                             )}
+                                            <Typography variant="caption" color="text.secondary" noWrap sx={{ display: 'block', lineHeight: 1.3 }}>
+                                                {row.fullname}
+                                            </Typography>
                                         </Box>
                                     </Box>
                                 </TableCell>
