@@ -173,18 +173,26 @@ export const ClientForm = ({
                     />
                 </Box>
 
-                <TextField
-                    fullWidth size="small" name="address" label="Dirección"
-                    value={values.address} onChange={handleChange} onBlur={handleBlur}
-                    error={touched.address && Boolean(errors.address)}
-                    helperText={touched.address && errors.address}
-                    sx={{ mb: 2 }}
-                />
+                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 2, mb: 2 }}>
+                    <TextField
+                        fullWidth size="small" name="calle" label="Calle"
+                        value={values.calle} onChange={handleChange} onBlur={handleBlur}
+                        error={touched.calle && Boolean(errors.calle)}
+                        helperText={(touched.calle && errors.calle) || 'Nombre de la calle'}
+                    />
+                    <TextField
+                        size="small" name="numero" label="Número"
+                        value={values.numero ?? ''}
+                        onChange={handleChange} onBlur={handleBlur}
+                        helperText="Opcional"
+                        sx={{ width: 110 }}
+                    />
+                </Box>
 
                 <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, mb: 2 }}>
                     <TextField
-                        fullWidth size="small" name="n_depto_casa" label="N° Depto / Casa"
-                        value={values.n_depto_casa ?? ''}
+                        fullWidth size="small" name="departamento" label="Depto / Oficina"
+                        value={values.departamento ?? ''}
                         onChange={handleChange} onBlur={handleBlur}
                         helperText="Opcional"
                     />
@@ -197,21 +205,17 @@ export const ClientForm = ({
                 </Box>
 
                 {/* ── Configuración ── */}
-                {hiddeButton && (
-                    <>
-                        <SectionLabel icon={<TuneOutlinedIcon fontSize="small" color="action" />} label="Configuración" />
-                        <Box sx={{ maxWidth: '50%' }}>
-                            <TextField
-                                fullWidth size="small" name="frequency" label="Frecuencia (días)"
-                                type="number"
-                                value={values.frequency ?? ''}
-                                onChange={handleChange} onBlur={handleBlur}
-                                inputProps={{ min: 1 }}
-                                helperText="Opcional — días estimados entre compras"
-                            />
-                        </Box>
-                    </>
-                )}
+                <SectionLabel icon={<TuneOutlinedIcon fontSize="small" color="action" />} label="Configuración" />
+                <Box sx={{ maxWidth: '50%' }}>
+                    <TextField
+                        fullWidth size="small" name="frequency" label="Frecuencia (días)"
+                        type="number"
+                        value={values.frequency ?? ''}
+                        onChange={handleChange} onBlur={handleBlur}
+                        inputProps={{ min: 1 }}
+                        helperText="Opcional — días estimados entre compras"
+                    />
+                </Box>
 
             </DialogContent>
 

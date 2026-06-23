@@ -2,7 +2,6 @@ import {
     Avatar, Box, Card, Chip, Divider, Grid, Typography
 } from '@mui/material';
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
-import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
 import TagOutlinedIcon from '@mui/icons-material/TagOutlined';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
@@ -21,16 +20,15 @@ const mockActivity = [
 export default function ProfilePage() {
     const user = useAuthStore(state => state.user);
 
-    const initials = user?.fullName
-        ? user.fullName.split(' ').map((n: string) => n[0]).slice(0, 2).join('').toUpperCase()
+    const initials = user?.name
+        ? user.name.split(' ').map((n: string) => n[0]).slice(0, 2).join('').toUpperCase()
         : '?';
 
     const infoRows = [
-        { icon: <TagOutlinedIcon fontSize="small" />,           label: 'ID',       value: user?.id != null ? String(user.id) : '—' },
-        { icon: <BadgeOutlinedIcon fontSize="small" />,         label: 'Nombre',   value: user?.fullName ?? '—' },
-        { icon: <PersonOutlinedIcon fontSize="small" />,        label: 'Usuario',  value: user?.userName ?? '—' },
-        { icon: <EmailOutlinedIcon fontSize="small" />,         label: 'Email',    value: user?.email ?? '—' },
-        { icon: <VerifiedUserOutlinedIcon fontSize="small" />,  label: 'Estado',   value: user?.isActive ? 'Activo' : 'Inactivo' },
+        { icon: <TagOutlinedIcon fontSize="small" />,           label: 'ID',     value: user?.id != null ? String(user.id) : '—' },
+        { icon: <BadgeOutlinedIcon fontSize="small" />,         label: 'Nombre', value: user?.name ?? '—' },
+        { icon: <VerifiedUserOutlinedIcon fontSize="small" />,  label: 'Rol',    value: user?.role ?? '—' },
+        { icon: <EmailOutlinedIcon fontSize="small" />,         label: 'Email',  value: user?.email ?? '—' },
     ];
 
     return (
@@ -69,11 +67,11 @@ export default function ProfilePage() {
 
                         <Box sx={{ mt: 6, textAlign: 'center', px: 3 }}>
                             <Typography variant="h6" fontWeight={700}>
-                                {user?.fullName ?? 'Sin nombre'}
+                                {user?.name ?? 'Sin nombre'}
                             </Typography>
                             <Chip
-                                label={user?.isActive ? 'Activo' : 'Inactivo'}
-                                color={user?.isActive ? 'success' : 'default'}
+                                label={user?.role ?? '—'}
+                                color="primary"
                                 size="small"
                                 sx={{ mt: 0.5, mb: 2 }}
                             />

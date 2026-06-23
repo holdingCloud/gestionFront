@@ -1,6 +1,6 @@
 import { devtools, persist } from "zustand/middleware";
 import { ClientService } from "../../services";
-import type { Client, ClientBody, ClientResponse } from "../../interfaces";
+import type { Client, ClientBody } from "../../interfaces";
 import { StateCreator, create } from "zustand";
 
 export interface ClientFetchParams {
@@ -19,7 +19,7 @@ export interface ClientState {
     porLlamarCount: number;
     getClients: (params?: ClientFetchParams) => Promise<void>;
     createClient: (client: ClientBody) => Promise<void>;
-    updateClient: (client: ClientResponse) => Promise<void>;
+    updateClient: (id: number, body: ClientBody) => Promise<void>;
     deleteClient: (id: number) => Promise<void>;
     changeAvailability: (id: number, status: boolean) => Promise<void>;
     setStateError: (status: boolean) => void;
@@ -50,8 +50,7 @@ const storeApi: StateCreator<ClientState> = (set, get) => ({
             console.log(error);
         }
     },
-    updateClient: async (clientData) => {
-        const { id, createdAt, updatedAt, contactStatus, frequencies, clientProductFrequencies, commune, company, available, ...body } = clientData as any;
+    updateClient: async (id, body) => {
         try {
             await ClientService.updateClient(id, body);
         } catch (error) {
@@ -73,8 +72,12 @@ const storeApi: StateCreator<ClientState> = (set, get) => ({
         try {
             const client = get().clients.find(c => c.id === id);
             if (client) {
-                const { createdAt, updatedAt, contactStatus, frequencies, clientProductFrequencies, commune, company, available, id: _id, ...body } = client as any;
-                await ClientService.updateClient(id, { ...body, available: status });
+                await ClientService.updateClient(id, {
+                    fullname: client.fullname,
+                    phone: client.phone,
+                    email: client.email,
+                    ...(client.companyId ? { companyId: client.companyId } : {}),
+                });
                 set(state => ({
                     clients: state.clients.map(c => c.id === id ? { ...c, available: status } : c)
                 }));

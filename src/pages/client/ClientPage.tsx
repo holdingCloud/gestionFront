@@ -1,13 +1,24 @@
-import { Container, Grid } from "@mui/material";
-import { CreateModal, DeleteModal, UrlBreadCrumbs } from "../../components";
-import { useClient } from "./hooks/useClient";
-import { ClientForm } from "./components/clientForm";
-import { FilterClientForm } from "./components/filterClientForm";
-import { ClientTable } from "./components/clientTable";
-import { ClientStatCards } from "./components/clientStatCards";
-import { ClientPurchasesDialog } from "./components/clientPurchasesDialog";
+import { useState } from 'react';
+import { Box } from '@mui/material';
+import { CreateModal, DeleteModal, UrlBreadCrumbs } from '../../components';
+import { useClient } from './hooks/useClient';
+import { ClientForm } from './components/clientForm';
+import { FilterClientForm } from './components/filterClientForm';
+import { ClientTable } from './components/clientTable';
+import { ClientStatCards } from './components/clientStatCards';
+import { ClientPurchasesDialog } from './components/clientPurchasesDialog';
+import { AiWhatsappPanel } from '../../components/ai-panel/AiWhatsappPanel';
+import { ClientResponse } from '../../interfaces/client.interface';
 
 const ClientPage = () => {
+
+    const [aiOpen, setAiOpen] = useState(false);
+    const [aiClient, setAiClient] = useState<ClientResponse | null>(null);
+
+    const openAiPanel = (client: ClientResponse) => {
+        setAiClient(client);
+        setAiOpen(true);
+    };
 
     const {
         clients,
@@ -35,6 +46,7 @@ const ClientPage = () => {
         onSetCreateModal,
         handleDelete,
         handleFilter,
+        refreshClients,
         purchasesOpen,
         dialogClientId,
         dialogClientName,
@@ -44,18 +56,26 @@ const ClientPage = () => {
     } = useClient();
 
     return (
-        <Container maxWidth={false} disableGutters>
-
+        <Box>
             <UrlBreadCrumbs />
 
-            <Grid container spacing={1} sx={{ px: 1, pt: 1 }}>
+            {/* Stat cards — 4-column grid */}
+            <Box sx={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(4, 1fr)',
+                gap: '14px',
+                px: '8px',
+                pt: '8px',
+                pb: '14px',
+            }}>
                 <ClientStatCards
                     total={stats.total}
                     porLlamar={stats.porLlamar}
                     vencidos={stats.vencidos}
                     contactados={stats.contactados}
+                    loading={loading}
                 />
-            </Grid>
+            </Box>
 
             <FilterClientForm
                 handleFilter={handleFilter}
@@ -73,6 +93,7 @@ const ClientPage = () => {
                 handleUpdate={handleUpdate}
                 handleDelete={handleDelete}
                 handlePurchases={handlePurchases}
+                onAiMessage={openAiPanel}
             />
 
             <DeleteModal
@@ -108,9 +129,15 @@ const ClientPage = () => {
                 clientId={dialogClientId}
                 clientName={dialogClientName}
                 onClose={() => setPurchasesOpen(false)}
+                onRefresh={refreshClients}
             />
 
-        </Container>
+            <AiWhatsappPanel
+                open={aiOpen}
+                onClose={() => setAiOpen(false)}
+                client={aiClient}
+            />
+        </Box>
     );
 };
 

@@ -39,14 +39,4 @@ export class AuthService {
         }
     }
 
-    static reNewSession = async (id: number) => {
-
-        try {
-
-            const { data } = await gestionApi.get<{ accessToken: string, refreshToken: string }>(`/auth/keepSession/${id}`);
-            return data;
-        } catch (error) {
-            throw new Error('Unable to login');
-        }
-    }
 }

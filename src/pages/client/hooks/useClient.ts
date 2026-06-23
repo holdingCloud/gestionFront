@@ -4,6 +4,7 @@ import { useFormik } from "formik";
 import * as Yup from 'yup';
 import { useClientStore, useCompanyStore } from "../../../store";
 import { ClientService } from "../../../services";
+import { ClientBody } from "../../../interfaces/client.interface";
 
 interface FilterParams {
     search?: string;
@@ -36,12 +37,10 @@ export const useClient = () => {
     const [dialogClientId, setDialogClientId] = useState<number>(0);
     const [dialogClientName, setDialogClientName] = useState<string>('');
 
-    // Server-side filter state
     const [searchFilter, setSearchFilter] = useState('');
     const [statusFilter, setStatusFilter] = useState('');
     const [communeIdFilter, setCommuneIdFilter] = useState<number | undefined>(undefined);
 
-    // Global counts (unfiltered, for stat cards)
     const [stats, setStats] = useState({ total: 0, porLlamar: 0, vencidos: 0, contactados: 0 });
 
     const doFetch = async (pg: number, limit: number, filters: FilterParams) => {
@@ -108,10 +107,11 @@ export const useClient = () => {
             fullname: data.fullname ?? '',
             email: data.email ?? '',
             phone: data.phone ?? '',
-            address: data.address ?? '',
-            n_depto_casa: data.n_depto_casa ?? '',
-            referencia: data.referencia ?? '',
-            communeId: data.communeId ?? '',
+            calle: data.direccion?.calle ?? '',
+            numero: data.direccion?.numero ?? '',
+            departamento: data.direccion?.departamento ?? '',
+            referencia: data.direccion?.referencia ?? '',
+            communeId: data.direccion?.communeId ?? '',
             frequency: data.frequency ?? '',
             companyId: data.companyId ?? '',
         });
@@ -122,9 +122,29 @@ export const useClient = () => {
         resetForm();
     };
 
+    const buildDireccionPrincipal = (vals: typeof values) => {
+        if (!vals.calle) return undefined;
+        return {
+            calle: vals.calle,
+            ...(vals.numero ? { numero: vals.numero } : {}),
+            ...(vals.departamento ? { departamento: vals.departamento } : {}),
+            ...(vals.referencia ? { referencia: vals.referencia } : {}),
+            ...(vals.communeId ? { communeId: Number(vals.communeId) } : {}),
+        };
+    };
+
     const saveUpdate = async () => {
-        const dataUpdate = { id: deleteId, ...values };
-        await updateClient(dataUpdate as any);
+        const payload: ClientBody = {
+            fullname: values.fullname,
+            email: values.email,
+            phone: values.phone,
+            ...(values.companyId ? { companyId: Number(values.companyId) } : {}),
+            ...(values.frequency !== '' && values.frequency !== undefined ? { frequency: Number(values.frequency) } : {}),
+        };
+        const dir = buildDireccionPrincipal(values);
+        if (dir) payload.direccionPrincipal = dir;
+
+        await updateClient(deleteId, payload);
         await doFetch(page, rowsPerPage, { search: searchFilter, contactStatus: statusFilter, communeId: communeIdFilter });
         await fetchStats();
         enqueueSnackbar('Cliente actualizado exitosamente', { variant: 'success' });
@@ -173,25 +193,30 @@ export const useClient = () => {
             fullname: '',
             email: '',
             phone: '',
-            address: '',
-            n_depto_casa: '',
+            calle: '',
+            numero: '',
+            departamento: '',
             referencia: '',
             communeId: '' as any,
             frequency: '' as any,
             companyId: '' as any,
         },
-        onSubmit: async ({ fullname, email, phone, address, n_depto_casa, referencia, communeId, frequency, companyId }, { resetForm }) => {
-            const freq = frequency !== '' && frequency !== undefined ? Number(frequency) : undefined;
-            const cid = communeId !== '' && communeId !== undefined ? Number(communeId) : undefined;
-            const compId = companyId !== '' && companyId !== undefined ? Number(companyId) : undefined;
-            await createClient({
-                fullname, email, phone, address,
-                ...(n_depto_casa ? { n_depto_casa } : {}),
-                ...(referencia ? { referencia } : {}),
-                ...(cid ? { communeId: cid } : {}),
+        onSubmit: async (vals, { resetForm }) => {
+            const freq = vals.frequency !== '' && vals.frequency !== undefined ? Number(vals.frequency) : undefined;
+            const compId = vals.companyId !== '' && vals.companyId !== undefined ? Number(vals.companyId) : undefined;
+
+            const payload: ClientBody = {
+                fullname: vals.fullname,
+                email: vals.email,
+                phone: vals.phone,
                 ...(freq ? { frequency: freq } : {}),
                 ...(compId ? { companyId: compId } : {}),
-            });
+            };
+
+            const dir = buildDireccionPrincipal(vals);
+            if (dir) payload.direccionPrincipal = dir;
+
+            await createClient(payload as any);
             setPage(0);
             await doFetch(0, rowsPerPage, { search: searchFilter, contactStatus: statusFilter, communeId: communeIdFilter });
             await fetchStats();
@@ -204,7 +229,7 @@ export const useClient = () => {
             phone: Yup.string()
                 .matches(/^\+56 9 \d{8}$/, 'Formato inválido. Ej: +56 9 95720483')
                 .required('Requerido'),
-            address: Yup.string().required('Requerido'),
+            calle: Yup.string().required('Requerido'),
         })
     });
 
@@ -214,6 +239,9 @@ export const useClient = () => {
         fetchStats();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    const refreshClients = () =>
+        doFetch(page, rowsPerPage, { search: searchFilter, contactStatus: statusFilter, communeId: communeIdFilter });
 
     return {
         clients: allClients,
@@ -242,6 +270,7 @@ export const useClient = () => {
         onSetCreateModal,
         handleDelete,
         handleFilter,
+        refreshClients,
         purchasesOpen,
         dialogClientId,
         dialogClientName,
