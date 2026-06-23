@@ -21,6 +21,7 @@ export const useCompany = () => {
     const [deleteId, setDeleteId] = useState(0);
     const [hiddeButton, setHiddeButton] = useState(true);
     const [nameFilter, setNameFilter] = useState('');
+    const [updatedId, setUpdatedId] = useState<number | null>(null);
 
     const handleChangePage = (_: MouseEvent<HTMLButtonElement> | null, newPage: number) => {
         setPage(newPage);
@@ -58,6 +59,8 @@ export const useCompany = () => {
     const saveUpdate = async () => {
         await updateCompany(deleteId, values);
         enqueueSnackbar('Empresa actualizada exitosamente', { variant: 'success' });
+        setUpdatedId(deleteId);
+        setTimeout(() => setUpdatedId(null), 2500);
         setCreateModal(false);
         resetForm();
         setHiddeButton(true);
@@ -108,6 +111,7 @@ export const useCompany = () => {
     return {
         companies: paginatedCompanies,
         loading,
+        updatedId,
         page,
         open,
         values,

@@ -10,6 +10,7 @@ interface FilterParams {
     search?: string;
     contactStatus?: string;
     communeId?: number;
+    companyId?: number;
 }
 
 export const useClient = () => {
@@ -40,9 +41,11 @@ export const useClient = () => {
     const [searchFilter, setSearchFilter] = useState('');
     const [statusFilter, setStatusFilter] = useState('');
     const [communeIdFilter, setCommuneIdFilter] = useState<number | undefined>(undefined);
+    const [companyIdFilter, setCompanyIdFilter] = useState<number | undefined>(undefined);
 
     const [stats, setStats] = useState({ total: 0, porLlamar: 0, vencidos: 0, contactados: 0 });
     const [isSavingUpdate, setIsSavingUpdate] = useState(false);
+    const [updatedId, setUpdatedId] = useState<number | null>(null);
 
     const doFetch = async (pg: number, limit: number, filters: FilterParams) => {
         await getClients({
@@ -51,6 +54,7 @@ export const useClient = () => {
             search: filters.search || undefined,
             contactStatus: filters.contactStatus || undefined,
             communeId: filters.communeId,
+            companyId: filters.companyId,
         });
     };
 
@@ -79,7 +83,7 @@ export const useClient = () => {
     ) => {
         event?.preventDefault();
         setPage(newPage);
-        doFetch(newPage, rowsPerPage, { search: searchFilter, contactStatus: statusFilter, communeId: communeIdFilter });
+        doFetch(newPage, rowsPerPage, { search: searchFilter, contactStatus: statusFilter, communeId: communeIdFilter, companyId: companyIdFilter });
     };
 
     const handleChangeRowsPerPage = (
@@ -88,7 +92,7 @@ export const useClient = () => {
         const newLimit = parseInt(event.target.value, 10);
         setRowsPerPage(newLimit);
         setPage(0);
-        doFetch(0, newLimit, { search: searchFilter, contactStatus: statusFilter, communeId: communeIdFilter });
+        doFetch(0, newLimit, { search: searchFilter, contactStatus: statusFilter, communeId: communeIdFilter, companyId: companyIdFilter });
     };
 
     const handleDelete = (id: number) => {
@@ -148,9 +152,11 @@ export const useClient = () => {
             if (dir) payload.direccionPrincipal = dir;
 
             await updateClient(deleteId, payload);
-            await doFetch(page, rowsPerPage, { search: searchFilter, contactStatus: statusFilter, communeId: communeIdFilter });
+            await doFetch(page, rowsPerPage, { search: searchFilter, contactStatus: statusFilter, communeId: communeIdFilter, companyId: companyIdFilter });
             await fetchStats();
             enqueueSnackbar('Cliente actualizado exitosamente', { variant: 'success' });
+            setUpdatedId(deleteId);
+            setTimeout(() => setUpdatedId(null), 2500);
             resetForm();
         } finally {
             setIsSavingUpdate(false);
@@ -163,19 +169,19 @@ export const useClient = () => {
             await deleteClient(deleteId);
             const newPage = allClients.length === 1 && page > 0 ? page - 1 : page;
             setPage(newPage);
-            await doFetch(newPage, rowsPerPage, { search: searchFilter, contactStatus: statusFilter, communeId: communeIdFilter });
+            await doFetch(newPage, rowsPerPage, { search: searchFilter, contactStatus: statusFilter, communeId: communeIdFilter, companyId: companyIdFilter });
             await fetchStats();
             enqueueSnackbar('Cliente eliminado exitosamente', { variant: 'success' });
         }
     };
 
-    const handleFilter = ({ name, address, communeId, status }: { name: string; address: string; communeId: number | undefined; status: string }) => {
-        const search = address.trim() || name.trim();
-        setSearchFilter(search);
-        setCommuneIdFilter(communeId);
+    const handleFilter = ({ name, address, status, companyId }: { name: string; address: string; status: string; companyId?: number }) => {
+        const search = name.trim() || address.trim() || undefined;
+        setSearchFilter(search ?? '');
         setStatusFilter(status);
+        setCompanyIdFilter(companyId);
         setPage(0);
-        doFetch(0, rowsPerPage, { search, contactStatus: status, communeId });
+        doFetch(0, rowsPerPage, { search, contactStatus: status, communeId: communeIdFilter, companyId });
     };
 
     const handlePurchases = (id: number, name: string) => {
@@ -225,7 +231,7 @@ export const useClient = () => {
 
             await createClient(payload as any);
             setPage(0);
-            await doFetch(0, rowsPerPage, { search: searchFilter, contactStatus: statusFilter, communeId: communeIdFilter });
+            await doFetch(0, rowsPerPage, { search: searchFilter, contactStatus: statusFilter, communeId: communeIdFilter, companyId: companyIdFilter });
             await fetchStats();
             enqueueSnackbar('Cliente creado exitosamente', { variant: 'success' });
             resetForm();
@@ -250,7 +256,7 @@ export const useClient = () => {
     }, []);
 
     const refreshClients = () =>
-        doFetch(page, rowsPerPage, { search: searchFilter, contactStatus: statusFilter, communeId: communeIdFilter });
+        doFetch(page, rowsPerPage, { search: searchFilter, contactStatus: statusFilter, communeId: communeIdFilter, companyId: companyIdFilter });
 
     return {
         clients: allClients,
@@ -267,6 +273,7 @@ export const useClient = () => {
         hiddeButton,
         companies,
         isSaving: isSubmitting || isSavingUpdate,
+        updatedId,
         handleSubmit,
         handleChange,
         handleBlur,

@@ -1,5 +1,7 @@
-import { Box, TextField, Button, InputAdornment } from "@mui/material";
+import { Box, TextField, Button, InputAdornment, Autocomplete } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
+import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
+import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
 import { useRef, useState } from "react";
 import { useThemeStore, THEME_TOKENS } from '../../../store/theme/theme.store';
 
@@ -10,29 +12,53 @@ const STATUS_FILTERS = [
     { value: 'CONTACTADO', label: 'Contactados' },
 ];
 
-export const FilterClientForm = ({ onSetCreateModal, handleFilter }: any) => {
+export const FilterClientForm = ({ onSetCreateModal, handleFilter, companies }: any) => {
     const themeVariant = useThemeStore(state => state.theme);
     const t = THEME_TOKENS[themeVariant];
 
-    const [search, setSearch] = useState('');
+    const [name, setName] = useState('');
+    const [address, setAddress] = useState('');
+    const [selectedCompany, setSelectedCompany] = useState<any>(null);
     const [activeStatus, setActiveStatus] = useState('');
-    const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    const applyFilter = (name: string, status: string) => {
-        handleFilter({ name, address: '', communeId: undefined, status });
+    const nameDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const addressDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    const apply = (n: string, addr: string, status: string, companyId?: number) => {
+        handleFilter({ name: n, address: addr, status, companyId });
     };
 
-    const handleSearchChange = (value: string) => {
-        setSearch(value);
-        if (debounceRef.current) clearTimeout(debounceRef.current);
-        debounceRef.current = setTimeout(() => {
-            applyFilter(value, activeStatus);
+    const handleNameChange = (value: string) => {
+        setName(value);
+        if (nameDebounce.current) clearTimeout(nameDebounce.current);
+        nameDebounce.current = setTimeout(() => {
+            apply(value, address, activeStatus, selectedCompany?.id);
         }, 400);
+    };
+
+    const handleAddressChange = (value: string) => {
+        setAddress(value);
+        if (addressDebounce.current) clearTimeout(addressDebounce.current);
+        addressDebounce.current = setTimeout(() => {
+            apply(name, value, activeStatus, selectedCompany?.id);
+        }, 400);
+    };
+
+    const handleCompanyChange = (_: any, newVal: any) => {
+        setSelectedCompany(newVal);
+        apply(name, address, activeStatus, newVal?.id);
     };
 
     const handleStatusClick = (status: string) => {
         setActiveStatus(status);
-        applyFilter(search, status);
+        apply(name, address, status, selectedCompany?.id);
+    };
+
+    const inputSx = {
+        '& .MuiOutlinedInput-root': {
+            borderRadius: '10px',
+            bgcolor: 'background.paper',
+        },
     };
 
     return (
@@ -42,13 +68,14 @@ export const FilterClientForm = ({ onSetCreateModal, handleFilter }: any) => {
             gap: 1.5,
             px: '8px',
             pb: '8px',
+            flexWrap: 'wrap',
         }}>
-            {/* Search */}
+            {/* Nombre */}
             <TextField
                 size="small"
-                placeholder="Buscar cliente por nombre..."
-                value={search}
-                onChange={e => handleSearchChange(e.target.value)}
+                placeholder="Buscar por nombre..."
+                value={name}
+                onChange={e => handleNameChange(e.target.value)}
                 InputProps={{
                     startAdornment: (
                         <InputAdornment position="start">
@@ -56,13 +83,51 @@ export const FilterClientForm = ({ onSetCreateModal, handleFilter }: any) => {
                         </InputAdornment>
                     ),
                 }}
-                sx={{
-                    flexGrow: 1,
-                    '& .MuiOutlinedInput-root': {
-                        borderRadius: '10px',
-                        bgcolor: 'background.paper',
-                    },
+                sx={{ flex: '1 1 160px', minWidth: 140, ...inputSx }}
+            />
+
+            {/* Dirección */}
+            <TextField
+                size="small"
+                placeholder="Buscar por dirección..."
+                value={address}
+                onChange={e => handleAddressChange(e.target.value)}
+                InputProps={{
+                    startAdornment: (
+                        <InputAdornment position="start">
+                            <LocationOnOutlinedIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+                        </InputAdornment>
+                    ),
                 }}
+                sx={{ flex: '1 1 160px', minWidth: 140, ...inputSx }}
+            />
+
+            {/* Empresa */}
+            <Autocomplete
+                size="small"
+                options={companies ?? []}
+                getOptionLabel={(o: any) => o.name ?? ''}
+                value={selectedCompany}
+                onChange={handleCompanyChange}
+                isOptionEqualToValue={(o: any, v: any) => o.id === v.id}
+                renderInput={(params) => (
+                    <TextField
+                        {...params}
+                        placeholder="Filtrar por empresa..."
+                        InputProps={{
+                            ...params.InputProps,
+                            startAdornment: (
+                                <>
+                                    <InputAdornment position="start">
+                                        <BusinessOutlinedIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+                                    </InputAdornment>
+                                    {params.InputProps.startAdornment}
+                                </>
+                            ),
+                        }}
+                    />
+                )}
+                sx={{ flex: '1 1 160px', minWidth: 140, ...inputSx }}
             />
 
             {/* Status pills */}
@@ -101,7 +166,7 @@ export const FilterClientForm = ({ onSetCreateModal, handleFilter }: any) => {
                 })}
             </Box>
 
-            {/* New client */}
+            {/* Nuevo cliente */}
             <Button
                 variant="contained"
                 onClick={() => onSetCreateModal(true)}

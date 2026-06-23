@@ -46,6 +46,7 @@ interface UserTableProps {
     handleChangeRowsPerPage: (event: React.ChangeEvent<HTMLInputElement>) => void;
     users: Users[];
     loading?: boolean;
+    updatedId?: number | null;
     handleActive: (id: number, status: boolean) => void;
     handleUpdate: (row: Users) => void;
     handleDelete: (id: number) => void;
@@ -53,7 +54,7 @@ interface UserTableProps {
 
 export const UserTable = ({
     count, page, rowsPerPage, handleChangePage, handleChangeRowsPerPage,
-    users, loading, handleActive, handleUpdate, handleDelete,
+    users, loading, updatedId, handleActive, handleUpdate, handleDelete,
 }: UserTableProps) => {
     const themeVariant = useThemeStore(state => state.theme);
     const t = THEME_TOKENS[themeVariant];
@@ -97,7 +98,11 @@ export const UserTable = ({
                         const avatarColor = getAvatarColor(row.id);
 
                         return (
-                            <TableRow key={row.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                            <TableRow key={row.id} sx={{
+                                '&:last-child td, &:last-child th': { border: 0 },
+                                transition: 'background-color 0.6s ease',
+                                backgroundColor: row.id === updatedId ? 'rgba(16,185,129,0.10)' : undefined,
+                            }}>
 
                                 {/* Avatar + Nombre + Email */}
                                 <TableCell sx={cellSx}>

@@ -9,6 +9,7 @@ export interface ClientFetchParams {
     search?: string;
     contactStatus?: string;
     communeId?: number;
+    companyId?: number;
 }
 
 export interface ClientState {

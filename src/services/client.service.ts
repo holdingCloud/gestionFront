@@ -10,6 +10,7 @@ export class ClientService {
         search?: string;
         contactStatus?: string;
         communeId?: number;
+        companyId?: number;
     }): Promise<ClientPaginatedResponse> => {
         try {
             const { page = 1, limit = 20, ...filters } = params ?? {};

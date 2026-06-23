@@ -54,6 +54,7 @@ const ClientPage = () => {
         handlePurchases,
         companies,
         isSaving,
+        updatedId,
     } = useClient();
 
     return (
@@ -81,6 +82,7 @@ const ClientPage = () => {
             <FilterClientForm
                 handleFilter={handleFilter}
                 onSetCreateModal={onSetCreateModal}
+                companies={companies}
             />
 
             <ClientTable
@@ -91,6 +93,7 @@ const ClientPage = () => {
                 handleChangeRowsPerPage={handleChangeRowsPerPage}
                 clients={clients}
                 loading={loading}
+                updatedId={updatedId}
                 handleUpdate={handleUpdate}
                 handleDelete={handleDelete}
                 handlePurchases={handlePurchases}

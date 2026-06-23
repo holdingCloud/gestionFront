@@ -22,6 +22,8 @@ export const EmployeePage = () => {
         errors,
         touched,
         hiddeButton,
+        loading,
+        updatedId,
         //Methods
         saveUpdate,
         cancelUpdate,
@@ -60,6 +62,8 @@ export const EmployeePage = () => {
                 handleChangePage={handleChangePage}
                 handleChangeRowsPerPage={handleChangeRowsPerPage}
                 data={employees}
+                loading={loading}
+                updatedId={updatedId}
                 handleActive={handleActive}
                 handleUpdate={handleUpdate}
                 handleDelete={handleDelete}

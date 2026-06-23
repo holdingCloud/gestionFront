@@ -28,6 +28,8 @@ export const useUser = () => {
     const [hiddeButton, setHiddeButton] = useState(true);
     const [filter, setFilter] = useState<UserFilter>({ fullName: '', email: '' });
     const [isSavingUpdate, setIsSavingUpdate] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [updatedId, setUpdatedId] = useState<number | null>(null);
 
     const handleClickShowPassword = () => setShowPassword(prev => !prev);
 
@@ -83,6 +85,8 @@ export const useUser = () => {
             await updateUser(deleteId, payload);
             await getUsers(page, rowsPerPage, filter);
             enqueueSnackbar('Usuario actualizado exitosamente', { variant: 'success' });
+            setUpdatedId(deleteId);
+            setTimeout(() => setUpdatedId(null), 2500);
             resetForm();
         } finally {
             setIsSavingUpdate(false);
@@ -156,7 +160,8 @@ export const useUser = () => {
     });
 
     useEffect(() => {
-        getUsers(page, rowsPerPage, filter);
+        setLoading(true);
+        getUsers(page, rowsPerPage, filter).finally(() => setLoading(false));
     }, [page, rowsPerPage, filter]);
 
     useEffect(() => {
@@ -176,7 +181,9 @@ export const useUser = () => {
         showPassword,
         hiddeButton,
         roles,
+        loading,
         isSaving: isSubmitting || isSavingUpdate,
+        updatedId,
         handleSubmit,
         handleChange,
         handleBlur,
