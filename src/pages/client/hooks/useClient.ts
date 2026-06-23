@@ -42,6 +42,7 @@ export const useClient = () => {
     const [communeIdFilter, setCommuneIdFilter] = useState<number | undefined>(undefined);
 
     const [stats, setStats] = useState({ total: 0, porLlamar: 0, vencidos: 0, contactados: 0 });
+    const [isSavingUpdate, setIsSavingUpdate] = useState(false);
 
     const doFetch = async (pg: number, limit: number, filters: FilterParams) => {
         await getClients({
@@ -134,21 +135,26 @@ export const useClient = () => {
     };
 
     const saveUpdate = async () => {
-        const payload: ClientBody = {
-            fullname: values.fullname,
-            email: values.email,
-            phone: values.phone,
-            ...(values.companyId ? { companyId: Number(values.companyId) } : {}),
-            ...(values.frequency !== '' && values.frequency !== undefined ? { frequency: Number(values.frequency) } : {}),
-        };
-        const dir = buildDireccionPrincipal(values);
-        if (dir) payload.direccionPrincipal = dir;
+        setIsSavingUpdate(true);
+        try {
+            const payload: ClientBody = {
+                fullname: values.fullname,
+                email: values.email,
+                phone: values.phone,
+                ...(values.companyId ? { companyId: Number(values.companyId) } : {}),
+                ...(values.frequency !== '' && values.frequency !== undefined ? { frequency: Number(values.frequency) } : {}),
+            };
+            const dir = buildDireccionPrincipal(values);
+            if (dir) payload.direccionPrincipal = dir;
 
-        await updateClient(deleteId, payload);
-        await doFetch(page, rowsPerPage, { search: searchFilter, contactStatus: statusFilter, communeId: communeIdFilter });
-        await fetchStats();
-        enqueueSnackbar('Cliente actualizado exitosamente', { variant: 'success' });
-        resetForm();
+            await updateClient(deleteId, payload);
+            await doFetch(page, rowsPerPage, { search: searchFilter, contactStatus: statusFilter, communeId: communeIdFilter });
+            await fetchStats();
+            enqueueSnackbar('Cliente actualizado exitosamente', { variant: 'success' });
+            resetForm();
+        } finally {
+            setIsSavingUpdate(false);
+        }
     };
 
     const onClose = async (action: boolean) => {
@@ -188,6 +194,7 @@ export const useClient = () => {
         setValues,
         resetForm,
         setFieldValue,
+        isSubmitting,
     } = useFormik({
         initialValues: {
             fullname: '',
@@ -230,7 +237,9 @@ export const useClient = () => {
                 .matches(/^\+56 9 \d{8}$/, 'Formato inválido. Ej: +56 9 95720483')
                 .required('Requerido'),
             calle: Yup.string().required('Requerido'),
-        })
+        }),
+        validateOnChange: false,
+        validateOnBlur: true,
     });
 
     useEffect(() => {
@@ -257,6 +266,7 @@ export const useClient = () => {
         createModal,
         hiddeButton,
         companies,
+        isSaving: isSubmitting || isSavingUpdate,
         handleSubmit,
         handleChange,
         handleBlur,

@@ -57,7 +57,13 @@ export const CreateRoleModal = ({ open, onClose, formik, creating }: CreateRoleM
                             minWidth: 90,
                         }}
                     >
-                        {creating ? <CircularProgress size={18} sx={{ color: '#fff' }} /> : 'Crear'}
+                        {creating
+                        ? <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <CircularProgress size={14} sx={{ color: '#fff' }} />
+                            <span>Guardando registro...</span>
+                          </Box>
+                        : 'Crear'
+                    }
                     </Button>
                 </DialogActions>
             </Box>

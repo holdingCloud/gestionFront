@@ -46,6 +46,7 @@ export const ClientForm = ({
     saveUpdate,
     cancelUpdate,
     companies,
+    isSaving,
 }: any) => {
     const [regions, setRegions] = useState<Region[]>([]);
     const [valparaisoRegion, setValparaisoRegion] = useState<Region | null>(null);
@@ -220,12 +221,23 @@ export const ClientForm = ({
             </DialogContent>
 
             <DialogActions sx={{ px: 3, pb: 2, pt: 1 }}>
-                <Button variant="outlined" onClick={() => { onSetCreateModal(false); cancelUpdate(); }}>
+                <Button variant="outlined" onClick={() => { onSetCreateModal(false); cancelUpdate(); }} disabled={isSaving}>
                     Cancelar
                 </Button>
                 {hiddeButton
-                    ? <Button variant="contained" type="submit" color="primary">Guardar</Button>
-                    : <Button variant="contained" type="button" color="info" onClick={saveUpdate}>Guardar cambios</Button>
+                    ? (
+                        <Button variant="contained" type="submit" color="primary" disabled={isSaving}
+                            startIcon={isSaving ? <CircularProgress size={16} color="inherit" /> : undefined}
+                        >
+                            {isSaving ? 'Guardando registro...' : 'Guardar'}
+                        </Button>
+                    ) : (
+                        <Button variant="contained" type="button" color="info" onClick={saveUpdate} disabled={isSaving}
+                            startIcon={isSaving ? <CircularProgress size={16} color="inherit" /> : undefined}
+                        >
+                            {isSaving ? 'Guardando registro...' : 'Guardar cambios'}
+                        </Button>
+                    )
                 }
             </DialogActions>
         </Box>

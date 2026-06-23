@@ -97,6 +97,8 @@ export const useCompany = () => {
             name: Yup.string().min(2, 'Mínimo 2 caracteres').max(150, 'Máximo 150 caracteres').required('Requerido'),
             description: Yup.string().max(500, 'Máximo 500 caracteres'),
         }),
+        validateOnChange: false,
+        validateOnBlur: true,
     });
 
     useEffect(() => {

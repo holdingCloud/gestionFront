@@ -53,6 +53,7 @@ const ClientPage = () => {
         setPurchasesOpen,
         handlePurchases,
         companies,
+        isSaving,
     } = useClient();
 
     return (
@@ -121,6 +122,7 @@ const ClientPage = () => {
                     saveUpdate={saveUpdate}
                     cancelUpdate={cancelUpdate}
                     companies={companies}
+                    isSaving={isSaving}
                 />
             </CreateModal>
 
