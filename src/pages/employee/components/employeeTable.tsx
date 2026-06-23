@@ -1,8 +1,6 @@
 import { VerifiedUserOutlined, GppBadOutlined, EditOutlined, DeleteForeverOutlined } from "@mui/icons-material"
-import { Grid, TableHead, TableRow, TableCell, TableBody, Tooltip, ButtonGroup, Button } from "@mui/material"
+import { Box, CircularProgress, Grid, TableHead, TableRow, TableCell, TableBody, Tooltip, ButtonGroup, Button } from "@mui/material"
 import { DataTable } from "../../../components"
-
-
 
 export const EmployeeTable = ({
     count,
@@ -11,12 +9,12 @@ export const EmployeeTable = ({
     handleChangePage,
     handleChangeRowsPerPage,
     data,
+    loading,
+    updatedId,
     handleActive,
     handleUpdate,
     handleDelete
 }: any) => {
-
-
     return (
         <Grid
             sx={{
@@ -31,82 +29,81 @@ export const EmployeeTable = ({
             item={true}
             xs={12} sm={12} md={12} lg={12}
         >
-
-            <Grid item={true} xs={12} >
-
+            <Grid item={true} xs={12}>
                 <DataTable
                     count={count}
                     page={page}
                     rowsPerPage={rowsPerPage}
                     handleChangePage={handleChangePage}
-                    handleChangeRowsPerPage={handleChangeRowsPerPage} >
+                    handleChangeRowsPerPage={handleChangeRowsPerPage}
+                >
                     <TableHead>
                         <TableRow>
-                            <TableCell
-                                component="th"
-                                scope="row">RUT</TableCell>
+                            <TableCell component="th" scope="row">RUT</TableCell>
                             <TableCell>Nombre completo</TableCell>
-                            <TableCell >Email</TableCell>
-                            <TableCell >Ciudad</TableCell>
-                            <TableCell >Dirección</TableCell>
-                            <TableCell >Fecha Contrato</TableCell>
-                            <TableCell >Tipo empleado</TableCell>
-                            <TableCell >Sueldo</TableCell>
-                            <TableCell >Estado</TableCell>
-                            <TableCell >Acciones</TableCell>
+                            <TableCell>Email</TableCell>
+                            <TableCell>Ciudad</TableCell>
+                            <TableCell>Dirección</TableCell>
+                            <TableCell>Fecha Contrato</TableCell>
+                            <TableCell>Tipo empleado</TableCell>
+                            <TableCell>Sueldo</TableCell>
+                            <TableCell>Estado</TableCell>
+                            <TableCell>Acciones</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {(data?.length != 0) ? data?.map((row: any) => (
+                        {loading ? (
+                            <TableRow>
+                                <TableCell colSpan={10} sx={{ py: 6, border: 0 }}>
+                                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                                        <CircularProgress />
+                                    </Box>
+                                </TableCell>
+                            </TableRow>
+                        ) : data?.length > 0 ? data.map((row: any) => (
                             <TableRow
                                 key={row.id}
-                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                sx={{
+                                    '&:last-child td, &:last-child th': { border: 0 },
+                                    transition: 'background-color 0.6s ease',
+                                    backgroundColor: row.id === updatedId ? 'rgba(16,185,129,0.10)' : undefined,
+                                }}
                             >
-                                <TableCell
-
-                                    component="th"
-                                    scope="row">
-                                    {row.rut}
+                                <TableCell component="th" scope="row">{row.rut}</TableCell>
+                                <TableCell>{row.fullname}</TableCell>
+                                <TableCell>{row.email}</TableCell>
+                                <TableCell>{row.city}</TableCell>
+                                <TableCell>{row.address}</TableCell>
+                                <TableCell>{row.hireDate}</TableCell>
+                                <TableCell>{row.type}</TableCell>
+                                <TableCell>{row.salary}</TableCell>
+                                <TableCell sx={{ textAlign: 'center' }}>
+                                    {row.available
+                                        ? <Tooltip onClick={() => handleActive(row.id, false)} title="ACTIVO" sx={{ cursor: 'pointer' }}>
+                                            <VerifiedUserOutlined color='success' />
+                                          </Tooltip>
+                                        : <Tooltip onClick={() => handleActive(row.id, true)} title="INACTIVO" sx={{ cursor: 'pointer' }}>
+                                            <GppBadOutlined color='error' />
+                                          </Tooltip>
+                                    }
                                 </TableCell>
-                                <TableCell >{row.fullname}</TableCell>
-                                <TableCell >{row.email}</TableCell>
-                                <TableCell >{row.city}</TableCell>
-                                <TableCell >{row.address}</TableCell>
-                                <TableCell >{row.hireDate}</TableCell>
-                                <TableCell >{row.type}</TableCell>
-                                <TableCell >{row.salary}</TableCell>
-                                <TableCell sx={{
-                                    textAlign: "center"
-                                }}>{
-                                        row.available ?
-                                            (<Tooltip onClick={() => handleActive(row.id, false)} title="ACTIVO" sx={{ cursor: "pointer" }}>
-                                                <VerifiedUserOutlined color='success' />
-                                            </Tooltip>)
-                                            : (<Tooltip onClick={() => handleActive(row.id, true)} title="INACTIVO" sx={{ cursor: "pointer" }} >
-                                                <GppBadOutlined color='error' />
-                                            </Tooltip>)
-                                    }</TableCell>
-                                <TableCell
-                                ><ButtonGroup
-                                    disableElevation
-                                    variant="contained"
-                                    aria-label="Disabled button group"
-
-                                >
+                                <TableCell>
+                                    <ButtonGroup disableElevation variant="contained" aria-label="Disabled button group">
                                         <Button onClick={() => handleUpdate(row)}><EditOutlined /></Button>
                                         <Button color="error" onClick={() => handleDelete(row.id)}><DeleteForeverOutlined /></Button>
-                                    </ButtonGroup></TableCell>
+                                    </ButtonGroup>
+                                </TableCell>
                             </TableRow>
-                        )) : <TableRow >
-                            <TableCell colSpan={6} sx={{
-                                textAlign: 'center'
-                            }}>No se encontraron datos</TableCell>
-                        </TableRow>}
+                        )) : (
+                            <TableRow>
+                                <TableCell colSpan={10} sx={{ textAlign: 'center' }}>
+                                    No se encontraron datos
+                                </TableCell>
+                            </TableRow>
+                        )}
                     </TableBody>
                 </DataTable>
-
             </Grid>
-
         </Grid>
     )
 }

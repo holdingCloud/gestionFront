@@ -21,6 +21,7 @@ export const useRoles = () => {
     const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
     const [savingModulos, setSavingModulos] = useState(false);
     const [creatingRole, setCreatingRole] = useState(false);
+    const [loadingRoles, setLoadingRoles] = useState(false);
 
     const formik = useFormik<{ type: string }>({
         initialValues: { type: '' },
@@ -83,7 +84,8 @@ export const useRoles = () => {
     };
 
     useEffect(() => {
-        getRolesConModulos();
+        setLoadingRoles(true);
+        getRolesConModulos().finally(() => setLoadingRoles(false));
     }, []);
 
     return {
@@ -96,6 +98,7 @@ export const useRoles = () => {
         confirmDeleteOpen,
         savingModulos,
         creatingRole,
+        loadingRoles,
         formik,
         handleOpenModulos,
         handleSaveModulos,

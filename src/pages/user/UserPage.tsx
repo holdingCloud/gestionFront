@@ -54,6 +54,8 @@ const UserPage = () => {
         handleDelete,
         handleFilter,
         isSaving,
+        loading,
+        updatedId,
     } = useUser();
 
     return (
@@ -99,6 +101,8 @@ const UserPage = () => {
                     handleChangePage={handleChangePage}
                     handleChangeRowsPerPage={handleChangeRowsPerPage}
                     users={users}
+                    loading={loading}
+                    updatedId={updatedId}
                     handleActive={handleActive}
                     handleUpdate={handleUpdate}
                     handleDelete={handleDelete}
