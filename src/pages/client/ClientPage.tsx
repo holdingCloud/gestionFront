@@ -46,6 +46,7 @@ const ClientPage = () => {
         onSetCreateModal,
         handleDelete,
         handleFilter,
+        refreshClients,
         purchasesOpen,
         dialogClientId,
         dialogClientName,
@@ -128,6 +129,7 @@ const ClientPage = () => {
                 clientId={dialogClientId}
                 clientName={dialogClientName}
                 onClose={() => setPurchasesOpen(false)}
+                onRefresh={refreshClients}
             />
 
             <AiWhatsappPanel

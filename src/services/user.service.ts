@@ -1,6 +1,6 @@
 import { AxiosError } from "axios";
 import { gestionApi } from "../api/gestion.api";
-import { UserResponse, Users, UserBody, UserFilter, Role } from "../interfaces";
+import { UserResponse, Users, UserBody, UserFilter, Role, RoleBody, RolConModulos, ModuloType } from "../interfaces";
 
 export class UserService {
 
@@ -65,6 +65,45 @@ export class UserService {
         } catch (error) {
             if (error instanceof AxiosError) throw new Error(error.response?.data?.message ?? 'Error al obtener roles.');
             throw new Error('Error inesperado al obtener roles.');
+        }
+    };
+
+    static createRole = async (body: RoleBody): Promise<Role> => {
+        try {
+            const { data } = await gestionApi.post<Role>('/roles', body);
+            return data;
+        } catch (error) {
+            if (error instanceof AxiosError) throw new Error(error.response?.data?.message ?? 'Error al crear rol.');
+            throw new Error('Error inesperado al crear rol.');
+        }
+    };
+
+    static deleteRole = async (id: number): Promise<void> => {
+        try {
+            await gestionApi.delete(`/roles/${id}`);
+        } catch (error) {
+            if (error instanceof AxiosError) throw new Error(error.response?.data?.message ?? 'Error al eliminar rol.');
+            throw new Error('Error inesperado al eliminar rol.');
+        }
+    };
+
+    static getRolesConModulos = async (): Promise<RolConModulos[]> => {
+        try {
+            const { data } = await gestionApi.get<RolConModulos[]>('/rol-modulos');
+            return data;
+        } catch (error) {
+            if (error instanceof AxiosError) throw new Error(error.response?.data?.message ?? 'Error al obtener módulos.');
+            throw new Error('Error inesperado al obtener módulos.');
+        }
+    };
+
+    static replaceRolModulos = async (rolId: number, modulos: ModuloType[]): Promise<ModuloType[]> => {
+        try {
+            const { data } = await gestionApi.put<ModuloType[]>(`/rol-modulos/${rolId}`, { modulos });
+            return data;
+        } catch (error) {
+            if (error instanceof AxiosError) throw new Error(error.response?.data?.message ?? 'Error al guardar módulos.');
+            throw new Error('Error inesperado al guardar módulos.');
         }
     };
 }

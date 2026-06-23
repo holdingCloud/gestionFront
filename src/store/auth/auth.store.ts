@@ -14,7 +14,6 @@ export interface AuthState {
     logoutUser: () => void;
     getUser: () => any;
     setStateError: (status: boolean) => void;
-    reNewSession: () => void;
 }
 
 const storeApi: StateCreator<AuthState> = (set, get) => ({
@@ -24,9 +23,7 @@ const storeApi: StateCreator<AuthState> = (set, get) => ({
     loginUser: async (email: string, password: string) => {
         try {
             const { accessToken, refreshToken, user } = await AuthService.login(email, password);
-            set({ status: 'loading-session', accessToken, refreshToken, user });
-            await new Promise(resolve => setTimeout(resolve, 5000));
-            set({ status: 'authorized' });
+            set({ status: 'authorized', accessToken, refreshToken, user });
         } catch (error) {
             set({ status: 'unauthorized', accessToken: undefined, refreshToken: undefined, user: undefined, error: true });
         }
@@ -48,20 +45,6 @@ const storeApi: StateCreator<AuthState> = (set, get) => ({
     setStateError: (status) => {
         set({ error: status });
     },
-    reNewSession: async () => {
-        const id = get().user?.id;
-        if (id) {
-            try {
-                const { accessToken, refreshToken } = await AuthService.reNewSession(id);
-                console.log(accessToken, refreshToken)
-                set({ status: 'authorized', accessToken, refreshToken });
-            } catch (error) {
-                set({ status: 'unauthorized', accessToken: undefined, refreshToken: undefined, user: undefined });
-            }
-        }
-
-    }
-
 })
 
 

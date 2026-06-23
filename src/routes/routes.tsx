@@ -19,10 +19,9 @@ import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
 
 export interface Route {
     to: string;
-    //path: string;
-    //Component: LazyExoticComponent<JSXComponent> | JSXComponent,
     name: string;
     icon: ReactElement<SvgIconClassKey>;
+    modulo: string;
 }
 
 const LoginPage = lazy(async () => await import(/* webpackChunkName: "LoginPage" */'../pages/auth/LoginPage'));
@@ -135,73 +134,15 @@ export const router = createBrowserRouter([
 
 
 export const routes: Route[] = [
-    {
-        to: '/dashboard',
-        name: 'Dashboard',
-        icon: <SpaceDashboardIcon />
-    },
-    {
-        to: 'user',
-        //path: 'user/*',
-        //Component: lazy(() => import(/* webpackChunkName: "Users" */'../pages/user/UserPage')),
-        name: 'Usuarios',
-        icon: <SupervisorAccountOutlinedIcon />
-    },
-    {
-        to: 'client',
-        //path: 'inventory/*',
-        //Component: lazy(() => import(/* webpackChunkName: "Products" */'../pages/invetory/InventoryPage')),
-        name: 'Clientes',
-        icon: <RecentActorsIcon />
-    },
-    {
-        to: 'employee',
-        name: 'Empleados',
-        icon: <SupervisedUserCircleIcon />
-    },
-    {
-        to: 'inventory',
-        //path: 'inventory/*',
-        //Component: lazy(() => import(/* webpackChunkName: "Products" */'../pages/invetory/InventoryPage')),
-        name: 'Inventario',
-        icon: <Inventory2OutlinedIcon />
-    },
-    {
-        to: 'buy',
-        //path: 'inventory/*',
-        //Component: lazy(() => import(/* webpackChunkName: "Products" */'../pages/invetory/InventoryPage')),
-        name: 'Compras',
-        icon: <ShoppingBasketIcon />
-    },
-    {
-        to: 'provider',
-        //path: 'inventory/*',
-        //Component: lazy(() => import(/* webpackChunkName: "Products" */'../pages/invetory/InventoryPage')),
-        name: 'Proveedores',
-        icon: <AccountBoxIcon />
-    },
-    {
-        to: 'bill',
-        //path: 'inventory/*',
-        //Component: lazy(() => import(/* webpackChunkName: "Products" */'../pages/invetory/InventoryPage')),
-        name: 'Cuentas',
-        icon: <AttachMoneyIcon />
-    },
-    {
-        to: '/sales',
-        //path: 'inventory/*',
-        //Component: lazy(() => import(/* webpackChunkName: "Products" */'../pages/invetory/InventoryPage')),
-        name: 'Hoja de venta',
-        icon: <ListAltIcon />
-    },
-    {
-        to: 'reports',
-        name: 'Reportes',
-        icon: <AssessmentOutlinedIcon />
-    },
-    {
-        to: 'company',
-        name: 'Empresas',
-        icon: <BusinessOutlinedIcon />
-    },
+    { to: '/dashboard', name: 'Dashboard',      icon: <SpaceDashboardIcon />,           modulo: 'DASHBOARD'    },
+    { to: 'user',       name: 'Usuarios',        icon: <SupervisorAccountOutlinedIcon />, modulo: 'USUARIOS'     },
+    { to: 'client',     name: 'Clientes',        icon: <RecentActorsIcon />,              modulo: 'CLIENTES'     },
+    { to: 'employee',   name: 'Empleados',       icon: <SupervisedUserCircleIcon />,      modulo: 'RRHH'         },
+    { to: 'inventory',  name: 'Inventario',      icon: <Inventory2OutlinedIcon />,        modulo: 'INVENTARIO'   },
+    { to: 'buy',        name: 'Compras',         icon: <ShoppingBasketIcon />,            modulo: 'COMPRAS'      },
+    { to: 'provider',   name: 'Proveedores',     icon: <AccountBoxIcon />,               modulo: 'PROVEEDORES'  },
+    { to: 'bill',       name: 'Cuentas',         icon: <AttachMoneyIcon />,              modulo: 'CUENTAS'      },
+    { to: '/sales',     name: 'Hoja de Venta',   icon: <ListAltIcon />,                  modulo: 'HOJA_DE_VENTA'},
+    { to: 'reports',    name: 'Reportes',        icon: <AssessmentOutlinedIcon />,        modulo: 'REPORTES'     },
+    { to: 'company',    name: 'Empresas',        icon: <BusinessOutlinedIcon />,          modulo: 'EMPRESAS'     },
 ];

@@ -1,6 +1,7 @@
 export interface Role {
     id: number;
     type: string;
+    _count?: { user: number };
 }
 
 export interface UserResponse {
@@ -33,4 +34,23 @@ export interface UserBody {
 export interface UserFilter {
     fullName?: string;
     email?: string;
+}
+
+export type TypePosition = 'SUPER_ADMIN' | 'ADMINISTRADOR' | 'REPARTIDOR' | 'COMUN';
+export type ModuloType = 'DASHBOARD' | 'USUARIOS' | 'CLIENTES' | 'RRHH' | 'INVENTARIO' | 'COMPRAS' | 'PROVEEDORES' | 'CUENTAS' | 'HOJA_DE_VENTA' | 'REPORTES' | 'EMPRESAS';
+
+export interface RolModulo {
+    id: number;
+    modulo: ModuloType;
+    rolId: number;
+}
+
+export interface RolConModulos {
+    id: number;
+    type: string;
+    modulos: RolModulo[];
+}
+
+export interface RoleBody {
+    type: string;
 }

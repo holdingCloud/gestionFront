@@ -29,12 +29,6 @@ const SectionLabel = ({ icon, label }: { icon: React.ReactNode; label: string })
     </Box>
 );
 
-const roleLabels: Record<string, string> = {
-    ADMINISTRADOR: 'Administrador',
-    REPARTIDOR: 'Repartidor',
-    COMUN: 'Común',
-};
-
 export const UserForm = ({
     onSetCreateModal,
     handleSubmit,
@@ -101,7 +95,7 @@ export const UserForm = ({
                     >
                         {(roles as Role[])?.map(r => (
                             <MenuItem key={r.id} value={r.id}>
-                                {roleLabels[r.type] ?? r.type}
+                                {r.type}
                             </MenuItem>
                         ))}
                     </Select>

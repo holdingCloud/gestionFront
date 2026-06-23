@@ -1,9 +1,9 @@
 export interface User {
     id: number;
-    userName: string;
-    fullName: string;
+    name: string;
     email: string;
-    password: string;
-    avatar: string;
-    isActive: boolean;
+    image: string;
+    rolesId: number;
+    role: string;
+    modulos: string[];
 }

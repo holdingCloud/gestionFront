@@ -25,6 +25,7 @@ export const DataTable = (
 
             <Table
                 sx={{
+                    width: '100%',
                     '& .MuiTableCell-root': {
                         padding: '5px 10px',
                     },

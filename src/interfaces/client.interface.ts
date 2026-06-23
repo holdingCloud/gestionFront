@@ -15,18 +15,35 @@ export interface ClientProductFrequency {
     updatedAt: string;
 }
 
+export interface DireccionCommune {
+    id: number;
+    name: string;
+    regionId: number;
+}
+
+export interface DireccionData {
+    id: number;
+    tipo: string;
+    calle: string;
+    numero: string | null;
+    departamento: string | null;
+    referencia: string | null;
+    communeId: number | null;
+    commune?: DireccionCommune | null;
+    latitud: number | null;
+    longitud: number | null;
+    principal: boolean;
+}
+
 export interface ClientResponse {
     id: number;
     fullname: string;
-    address: string;
-    n_depto_casa: string | null;
-    referencia: string | null;
     phone: string;
     email: string;
-    communeId: number | null;
-    commune?: { id: number; name: string; regionId: number } | null;
     companyId: number | null;
-    company?: { id: number; name: string } | null;
+    company?: { id: number; name: string; description?: string | null } | null;
+    direccionId?: number | null;
+    direccion?: DireccionData | null;
     available: boolean;
     contactStatus: string;
     frequency: number | null;
@@ -36,28 +53,28 @@ export interface ClientResponse {
     clientProductFrequencies: ClientProductFrequency[];
 }
 
-export interface ClientPaginatedResponse {
-    data: ClientResponse[];
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
+export interface DireccionPrincipalBody {
+    calle: string;
+    numero?: string;
+    departamento?: string;
+    referencia?: string;
+    communeId?: number;
+    latitud?: number;
+    longitud?: number;
 }
 
 export interface ClientBody {
     fullname: string;
-    address: string;
-    n_depto_casa?: string;
-    referencia?: string;
     phone: string;
     email: string;
-    communeId?: number;
     companyId?: number;
     frequency?: number;
+    contactStatus?: string;
+    direccionPrincipal?: DireccionPrincipalBody;
 }
 
-export interface ClientPurchasePaginatedResponse {
-    data: ClientPurchase[];
+export interface ClientPaginatedResponse {
+    data: ClientResponse[];
     total: number;
     page: number;
     limit: number;
@@ -81,6 +98,14 @@ export interface ClientPurchase {
     updatedAt: string;
 }
 
+export interface ClientPurchasePaginatedResponse {
+    data: ClientPurchase[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+}
+
 export interface PurchaseBody {
     productsId: number;
     quantity: number;
@@ -88,5 +113,5 @@ export interface PurchaseBody {
     purchaseDate: string;
 }
 
-// Keep ClientFrequency as alias for compatibility
+// Keep alias for compatibility
 export type ClientFrequency = ClientProductFrequency;

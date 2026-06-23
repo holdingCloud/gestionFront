@@ -3,14 +3,15 @@ import { useSnackbar } from 'notistack';
 import { useFormik } from "formik";
 import * as Yup from 'yup';
 import { useUserStore } from "../../../store";
-import { Role, UserFilter } from "../../../interfaces";
-import { UserService } from "../../../services";
+import { UserFilter } from "../../../interfaces";
 
 export const useUser = () => {
 
     const users = useUserStore(state => state.users);
     const count = useUserStore(state => state.count);
+    const roles = useUserStore(state => state.roles);
     const getUsers = useUserStore(state => state.getUsers);
+    const getRoles = useUserStore(state => state.getRoles);
     const createUser = useUserStore(state => state.createUser);
     const deleteUser = useUserStore(state => state.deleteUser);
     const changeStatus = useUserStore(state => state.changeStatus);
@@ -26,7 +27,6 @@ export const useUser = () => {
     const [deleteId, setDeleteId] = useState(0);
     const [hiddeButton, setHiddeButton] = useState(true);
     const [filter, setFilter] = useState<UserFilter>({ fullName: '', email: '' });
-    const [roles, setRoles] = useState<Role[]>([]);
 
     const handleClickShowPassword = () => setShowPassword(prev => !prev);
 
@@ -151,7 +151,7 @@ export const useUser = () => {
     }, [page, rowsPerPage, filter]);
 
     useEffect(() => {
-        UserService.getRoles().then(setRoles).catch(() => {});
+        getRoles();
     }, []);
 
     return {

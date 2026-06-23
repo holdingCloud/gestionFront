@@ -38,7 +38,7 @@ export function LoginPage() {
     const savedEmail = localStorage.getItem('rememberedEmail') ?? '';
     const [rememberMe, setRememberMe] = useState(!!savedEmail);
 
-    const { handleSubmit, errors, touched, values, handleBlur, handleChange } = useFormik({
+    const { handleSubmit, errors, touched, values, handleBlur, handleChange, isSubmitting } = useFormik({
         initialValues: { email: savedEmail, password: '' },
         onSubmit: async ({ email, password }) => {
             if (rememberMe) localStorage.setItem('rememberedEmail', email);
@@ -252,18 +252,34 @@ export function LoginPage() {
                     <Box
                         component="button"
                         type="submit"
+                        disabled={isSubmitting}
                         sx={{
                             width: '100%', padding: '14px', borderRadius: '12px',
-                            border: 'none', cursor: 'pointer',
-                            background: lt.primary, color: '#fff',
+                            border: 'none', cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                            background: isSubmitting ? lt.primaryDark : lt.primary,
+                            color: '#fff',
                             fontWeight: 700, fontSize: '15px', letterSpacing: '.2px',
                             boxShadow: `0 8px 20px rgba(14,159,140,.28)`,
                             fontFamily: "'Hanken Grotesque', system-ui, sans-serif",
-                            '&:hover': { background: lt.primaryDark },
+                            '&:hover': { background: isSubmitting ? lt.primaryDark : lt.primaryDark },
                             transition: 'background .15s',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
+                            opacity: isSubmitting ? 0.85 : 1,
                         }}
                     >
-                        Iniciar sesión
+                        {isSubmitting ? (
+                            <>
+                                <Box sx={{
+                                    width: 16, height: 16, borderRadius: '50%',
+                                    border: '2.5px solid rgba(255,255,255,.35)',
+                                    borderTopColor: '#fff',
+                                    animation: 'loginSpin 0.7s linear infinite',
+                                    '@keyframes loginSpin': { to: { transform: 'rotate(360deg)' } },
+                                    flexShrink: 0,
+                                }} />
+                                Cargando sesión...
+                            </>
+                        ) : 'Iniciar sesión'}
                     </Box>
                 </Box>
             </Box>
