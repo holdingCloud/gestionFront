@@ -81,32 +81,39 @@ export const Navbar = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const logoutUser = useAuthStore(state => state.logoutUser);
-    const reNewSession = useAuthStore(state => state.reNewSession);
     const user = useAuthStore(state => state.user);
     const porLlamarCount = useClientStore(state => state.porLlamarCount);
     const fetchPorLlamarCount = useClientStore(state => state.fetchPorLlamarCount);
     const themeVariant = useThemeStore(state => state.theme);
-    const setTheme = useThemeStore(state => state.setTheme);
     const t = THEME_TOKENS[themeVariant];
 
     const [collapsed, setCollapsed] = useState(false);
     const [openModal, setOpenModal] = useState(false);
 
-    const userInitials = user?.fullName
-        ? user.fullName.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()
+    const { activate } = useIdleTimer({
+        timeout: 900_000,          // 15 min sin actividad → logout automático
+        promptBeforeIdle: 60_000,  // Mostrar modal 60s antes del logout
+        onPrompt: () => setOpenModal(true),
+        onIdle: () => { logoutUser(); setOpenModal(false); },
+        onActive: () => setOpenModal(false), // Si hay actividad durante el aviso, cierra modal
+        throttle: 500,
+        crossTab: true,            // Sincroniza entre pestañas del mismo navegador
+        syncTimers: 200,
+    });
+
+    const userInitials = user?.name
+        ? user.name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()
         : '?';
+
+    const isSuperAdmin = user?.role === 'SUPER_ADMIN';
+    const userModulos = user?.modulos ?? [];
+    const visibleRoutes = isSuperAdmin ? routes : routes.filter(r => userModulos.includes(r.modulo));
 
     useEffect(() => {
         fetchPorLlamarCount();
         const interval = setInterval(fetchPorLlamarCount, 60_000);
         return () => clearInterval(interval);
     }, []);
-
-    useIdleTimer({
-        onIdle: () => setOpenModal(true),
-        timeout: 3500_000,
-        throttle: 500,
-    });
 
     const isActive = (to: string) => {
         if (to === '/dashboard') return location.pathname === '/dashboard' || location.pathname === '/dashboard/';
@@ -159,7 +166,7 @@ export const Navbar = () => {
 
                 {/* Nav */}
                 <Box component="nav" sx={{ display: 'flex', flexDirection: 'column', gap: '3px', flex: 1 }}>
-                    {routes.map(item => (
+                    {visibleRoutes.map(item => (
                         <NavItem
                             key={item.to}
                             to={item.to}
@@ -173,39 +180,6 @@ export const Navbar = () => {
                         />
                     ))}
                 </Box>
-
-                {/* Theme switcher */}
-                {!collapsed && (
-                    <Box sx={{
-                        mt: '14px', p: '12px', borderRadius: '14px',
-                        background: 'rgba(255,255,255,.06)',
-                        border: '1px solid rgba(255,255,255,.09)',
-                    }}>
-                        <Typography sx={{
-                            fontSize: '11px', textTransform: 'uppercase',
-                            letterSpacing: '1.5px', opacity: 0.6, color: t.brandink, mb: '9px',
-                        }}>
-                            Apariencia
-                        </Typography>
-                        <Box sx={{ display: 'flex', gap: '7px' }}>
-                            {(['calido', 'claro', 'oscuro'] as ThemeVariant[]).map(v => (
-                                <Tooltip key={v} title={THEME_TOKENS[v].label}>
-                                    <Box
-                                        onClick={() => setTheme(v)}
-                                        sx={{
-                                            flex: 1, height: '30px', borderRadius: '9px',
-                                            cursor: 'pointer',
-                                            background: THEME_TOKENS[v].swatch,
-                                            border: themeVariant === v ? '2px solid #fff' : '2px solid transparent',
-                                            boxShadow: themeVariant === v ? `0 0 0 2px ${t.primary}` : 'none',
-                                            transition: 'all .15s',
-                                        }}
-                                    />
-                                </Tooltip>
-                            ))}
-                        </Box>
-                    </Box>
-                )}
 
                 {/* User + Logout */}
                 <Tooltip title={collapsed ? 'Cerrar sesión' : ''}>
@@ -234,7 +208,7 @@ export const Navbar = () => {
                                         fontSize: '13px', fontWeight: 700, color: t.brandink,
                                         whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                                     }}>
-                                        {user?.fullName || user?.userName || 'Usuario'}
+                                        {user?.name || 'Usuario'}
                                     </Typography>
                                     <Typography sx={{ fontSize: '11.5px', opacity: 0.6, color: t.brandink }}>
                                         Cerrar sesión
@@ -349,7 +323,7 @@ export const Navbar = () => {
                         </Box>
                     </Tooltip>
 
-                    {/* Help / Config */}
+                    {/* Config */}
                     <Tooltip title="Configuración">
                         <Box
                             component="button"
@@ -362,9 +336,8 @@ export const Navbar = () => {
                             }}
                         >
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                                <circle cx="12" cy="12" r="10" />
-                                <path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3" />
-                                <path d="M12 17h.01" />
+                                <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z" />
                             </svg>
                         </Box>
                     </Tooltip>
@@ -377,9 +350,8 @@ export const Navbar = () => {
             </Box>
 
             <SessionModal
-                title="¿Desea mantener la sesión?"
                 open={openModal}
-                onClose={(action: boolean) => { reNewSession(); setOpenModal(action); }}
+                onKeepSession={() => { activate(); setOpenModal(false); }}
             />
         </Box>
     );

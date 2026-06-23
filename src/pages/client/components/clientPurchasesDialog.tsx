@@ -20,23 +20,18 @@ import { ClientPurchase, PurchaseStatus } from '../../../interfaces/client.inter
 import { Products } from '../../../interfaces/product.interface';
 import { ClientService } from '../../../services';
 import { ProductService } from '../../../services/product.service';
-import { useClientStore } from '../../../store';
 
 function formatDate(dateStr: string): string {
     return new Date(dateStr).toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
-function formatPrice(value: string): string {
-    const num = parseFloat(value);
-    if (isNaN(num)) return '';
-    return num.toLocaleString('es-CL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
 
 interface Props {
     open: boolean;
     clientId: number;
     clientName: string;
     onClose: () => void;
+    onRefresh: () => void;
 }
 
 const emptyForm = { productsId: '', quantity: '', unitPrice: '' };
@@ -49,7 +44,7 @@ const statusChipProps: Record<string, { label: string; color: 'success' | 'error
 
 const ROWS_PER_PAGE = 5;
 
-export const ClientPurchasesDialog = ({ open, clientId, clientName, onClose }: Props) => {
+export const ClientPurchasesDialog = ({ open, clientId, clientName, onClose, onRefresh }: Props) => {
     const [purchases, setPurchases] = useState<ClientPurchase[]>([]);
     const [total, setTotal] = useState(0);
     const [page, setPage] = useState(1);
@@ -59,7 +54,6 @@ export const ClientPurchasesDialog = ({ open, clientId, clientName, onClose }: P
     const [updatingId, setUpdatingId] = useState<number | null>(null);
     const [form, setForm] = useState(emptyForm);
     const [formError, setFormError] = useState('');
-    const [priceFocused, setPriceFocused] = useState(false);
     const [filter, setFilter] = useState(emptyFilter);
     const [appliedFilter, setAppliedFilter] = useState(emptyFilter);
 
@@ -68,7 +62,6 @@ export const ClientPurchasesDialog = ({ open, clientId, clientName, onClose }: P
     const [endDateVal, setEndDateVal] = useState<Dayjs | null>(null);
 
     const { enqueueSnackbar } = useSnackbar();
-    const getClients = useClientStore(state => state.getClients);
 
     const loadPurchases = (pg = page, f = appliedFilter) => {
         setLoading(true);
@@ -140,7 +133,7 @@ export const ClientPurchasesDialog = ({ open, clientId, clientName, onClose }: P
             await ClientService.updatePurchaseStatus(clientId, purchaseId, status);
             enqueueSnackbar(status === 'FINALIZADO' ? 'Compra finalizada' : 'Compra anulada', { variant: 'success' });
             loadPurchases(page);
-            getClients();
+            onRefresh();
         } catch (err: any) {
             enqueueSnackbar(err.message ?? 'Error al actualizar estado', { variant: 'error' });
         } finally {
@@ -247,14 +240,13 @@ export const ClientPurchasesDialog = ({ open, clientId, clientName, onClose }: P
 
                             <TextField
                                 label="Precio unitario" size="small" fullWidth
-                                value={priceFocused ? form.unitPrice : formatPrice(form.unitPrice)}
+                                type="number"
+                                value={form.unitPrice}
                                 onChange={e => {
-                                    const raw = e.target.value.replace(/[^0-9.]/g, '');
-                                    setForm(p => ({ ...p, unitPrice: raw }));
+                                    setForm(p => ({ ...p, unitPrice: e.target.value }));
                                     setFormError('');
                                 }}
-                                onFocus={() => setPriceFocused(true)}
-                                onBlur={() => setPriceFocused(false)}
+                                inputProps={{ min: 0, step: 'any' }}
                                 InputProps={{
                                     startAdornment: <InputAdornment position="start">$</InputAdornment>,
                                 }}

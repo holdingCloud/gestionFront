@@ -1,127 +1,126 @@
-import { Grid, TextField, Button, Tooltip, MenuItem, Select, FormControl, InputLabel } from "@mui/material"
-import Autocomplete from "@mui/material/Autocomplete";
+import { Box, TextField, Button, InputAdornment } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
-import SearchOffIcon from '@mui/icons-material/SearchOff';
-import { useFormik } from "formik";
-import { useEffect, useState } from "react";
-import { LocationService, Commune } from "../../../services";
+import { useRef, useState } from "react";
+import { useThemeStore, THEME_TOKENS } from '../../../store/theme/theme.store';
 
-const VALPARAISO_NAME = 'Región de Valparaíso';
-
-const statusOptions = [
+const STATUS_FILTERS = [
     { value: '', label: 'Todos' },
     { value: 'LLAMAR', label: 'Por llamar' },
-    { value: 'CONTACTADO', label: 'Contactado' },
-    { value: 'VENCIDO', label: 'Vencido' },
+    { value: 'VENCIDO', label: 'Vencidos' },
+    { value: 'CONTACTADO', label: 'Contactados' },
 ];
 
 export const FilterClientForm = ({ onSetCreateModal, handleFilter }: any) => {
-    const [communes, setCommunes] = useState<Commune[]>([]);
-    const [selectedCommune, setSelectedCommune] = useState<Commune | null>(null);
+    const themeVariant = useThemeStore(state => state.theme);
+    const t = THEME_TOKENS[themeVariant];
 
-    useEffect(() => {
-        LocationService.getRegions()
-            .then(regions => {
-                const valp = regions.find(r => r.name === VALPARAISO_NAME);
-                return valp ? LocationService.getCommunesByRegion(valp.id) : [];
-            })
-            .then(setCommunes)
-            .catch(() => {});
-    }, []);
+    const [search, setSearch] = useState('');
+    const [activeStatus, setActiveStatus] = useState('');
+    const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    const { handleSubmit, values, handleChange, resetForm, setFieldValue } = useFormik({
-        initialValues: { name: '', address: '', communeId: undefined as number | undefined, status: '' },
-        onSubmit: ({ name, address, communeId, status }) => {
-            handleFilter({ name, address, communeId, status });
-        },
-    });
+    const applyFilter = (name: string, status: string) => {
+        handleFilter({ name, address: '', communeId: undefined, status });
+    };
 
-    const handleClear = () => {
-        resetForm();
-        setSelectedCommune(null);
-        handleFilter({ name: '', address: '', communeId: undefined, status: '' });
+    const handleSearchChange = (value: string) => {
+        setSearch(value);
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        debounceRef.current = setTimeout(() => {
+            applyFilter(value, activeStatus);
+        }, 400);
+    };
+
+    const handleStatusClick = (status: string) => {
+        setActiveStatus(status);
+        applyFilter(search, status);
     };
 
     return (
-        <Grid
-            component="form"
-            onSubmit={handleSubmit}
-            sx={{
-                bgcolor: 'background.paper',
-                borderRadius: 2,
-                boxShadow: 10,
-                borderColor: '#ccc',
-                margin: 1,
-                padding: 1,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1,
-                flexWrap: 'wrap',
-            }}
-            item={true}
-            xs={12}
-        >
+        <Box sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1.5,
+            px: '8px',
+            pb: '8px',
+        }}>
+            {/* Search */}
             <TextField
                 size="small"
-                name="name"
-                label="Nombre"
-                value={values.name}
-                onChange={handleChange}
-                sx={{ flexGrow: 1, minWidth: 150, m: 0.5 }}
-            />
-
-            <TextField
-                size="small"
-                name="address"
-                label="Dirección"
-                value={values.address}
-                onChange={handleChange}
-                sx={{ flexGrow: 1, minWidth: 150, m: 0.5 }}
-            />
-
-            <Autocomplete
-                size="small"
-                options={communes}
-                getOptionLabel={(o) => o.name}
-                value={selectedCommune}
-                isOptionEqualToValue={(o, v) => o.id === v.id}
-                onChange={(_, newVal) => {
-                    setSelectedCommune(newVal);
-                    setFieldValue('communeId', newVal?.id ?? undefined);
+                placeholder="Buscar cliente por nombre..."
+                value={search}
+                onChange={e => handleSearchChange(e.target.value)}
+                InputProps={{
+                    startAdornment: (
+                        <InputAdornment position="start">
+                            <SearchIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+                        </InputAdornment>
+                    ),
                 }}
-                renderInput={(params) => (
-                    <TextField {...params} label="Comuna" />
-                )}
-                sx={{ flexGrow: 1, minWidth: 180, m: 0.5 }}
+                sx={{
+                    flexGrow: 1,
+                    '& .MuiOutlinedInput-root': {
+                        borderRadius: '10px',
+                        bgcolor: 'background.paper',
+                    },
+                }}
             />
 
-            <FormControl size="small" sx={{ minWidth: 160, m: 0.5 }}>
-                <InputLabel>Estado</InputLabel>
-                <Select
-                    name="status"
-                    value={values.status}
-                    label="Estado"
-                    onChange={(e) => setFieldValue('status', e.target.value)}
-                >
-                    {statusOptions.map(opt => (
-                        <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
-                    ))}
-                </Select>
-            </FormControl>
+            {/* Status pills */}
+            <Box sx={{ display: 'flex', gap: 0.75, flexShrink: 0 }}>
+                {STATUS_FILTERS.map(opt => {
+                    const isActive = activeStatus === opt.value;
+                    return (
+                        <Button
+                            key={opt.value}
+                            size="small"
+                            variant={isActive ? 'contained' : 'outlined'}
+                            onClick={() => handleStatusClick(opt.value)}
+                            disableElevation
+                            sx={{
+                                borderRadius: '20px',
+                                textTransform: 'none',
+                                fontWeight: isActive ? 700 : 500,
+                                fontSize: '13px',
+                                px: 2,
+                                py: '5px',
+                                whiteSpace: 'nowrap',
+                                ...(isActive ? {
+                                    bgcolor: '#0e9f8c',
+                                    borderColor: '#0e9f8c',
+                                    '&:hover': { bgcolor: '#0b8a79' },
+                                } : {
+                                    color: 'text.primary',
+                                    borderColor: t.border,
+                                    '&:hover': { borderColor: '#0e9f8c', color: '#0e9f8c', bgcolor: 'transparent' },
+                                }),
+                            }}
+                        >
+                            {opt.label}
+                        </Button>
+                    );
+                })}
+            </Box>
 
-            <Tooltip title="Buscar">
-                <Button variant="outlined" type="submit" size="small" sx={{ minWidth: 40, p: '6px' }}>
-                    <SearchIcon fontSize="small" />
-                </Button>
-            </Tooltip>
-            <Tooltip title="Limpiar">
-                <Button variant="outlined" color="error" onClick={handleClear} size="small" sx={{ minWidth: 40, p: '6px' }}>
-                    <SearchOffIcon fontSize="small" />
-                </Button>
-            </Tooltip>
-            <Button variant="contained" onClick={() => onSetCreateModal(true)} size="small" sx={{ whiteSpace: 'nowrap', mr: 0.5 }}>
-                + Nuevo Cliente
+            {/* New client */}
+            <Button
+                variant="contained"
+                onClick={() => onSetCreateModal(true)}
+                disableElevation
+                sx={{
+                    borderRadius: '10px',
+                    textTransform: 'none',
+                    fontWeight: 700,
+                    fontSize: '13px',
+                    px: 2.5,
+                    py: '7px',
+                    whiteSpace: 'nowrap',
+                    bgcolor: '#0e9f8c',
+                    '&:hover': { bgcolor: '#0b8a79' },
+                    flexShrink: 0,
+                }}
+            >
+                + Nuevo cliente
             </Button>
-        </Grid>
+        </Box>
     );
 };
