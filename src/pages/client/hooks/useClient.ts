@@ -40,7 +40,7 @@ export const useClient = () => {
 
     const [searchFilter, setSearchFilter] = useState('');
     const [statusFilter, setStatusFilter] = useState('');
-    const [communeIdFilter, setCommuneIdFilter] = useState<number | undefined>(undefined);
+    const communeIdFilter = undefined as number | undefined;
     const [companyIdFilter, setCompanyIdFilter] = useState<number | undefined>(undefined);
 
     const [stats, setStats] = useState({ total: 0, porLlamar: 0, vencidos: 0, contactados: 0 });
