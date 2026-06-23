@@ -84,6 +84,7 @@ interface ClientTableProps {
     handleChangeRowsPerPage: (event: React.ChangeEvent<HTMLInputElement>) => void;
     clients: ClientResponse[];
     loading: boolean;
+    updatedId?: number | null;
     handleUpdate: (row: ClientResponse) => void;
     handleDelete: (id: number) => void;
     handlePurchases: (id: number, name: string) => void;
@@ -92,7 +93,7 @@ interface ClientTableProps {
 
 export const ClientTable = ({
     count, page, rowsPerPage, handleChangePage, handleChangeRowsPerPage,
-    clients, loading, handleUpdate, handleDelete, handlePurchases, onAiMessage,
+    clients, loading, updatedId, handleUpdate, handleDelete, handlePurchases, onAiMessage,
 }: ClientTableProps) => {
     const themeVariant = useThemeStore(state => state.theme);
     const t = THEME_TOKENS[themeVariant];
@@ -156,7 +157,11 @@ export const ClientTable = ({
                         return (
                             <TableRow
                                 key={row.id}
-                                sx={{ '&:last-child td, &:last-child th': { borderBottom: 0 } }}
+                                sx={{
+                                    '&:last-child td, &:last-child th': { borderBottom: 0 },
+                                    transition: 'background-color 0.6s ease',
+                                    backgroundColor: row.id === updatedId ? 'rgba(16,185,129,0.10)' : undefined,
+                                }}
                             >
                                 {/* CLIENTE */}
                                 <TableCell component="th" scope="row" sx={cellSx}>

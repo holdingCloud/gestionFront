@@ -30,6 +30,7 @@ const CompanyPage = () => {
         onSetCreateModal,
         handleDelete,
         handleFilter,
+        updatedId,
     } = useCompany();
 
     return (
@@ -68,6 +69,7 @@ const CompanyPage = () => {
             <CompanyTable
                 companies={companies}
                 loading={loading}
+                updatedId={updatedId}
                 count={count}
                 page={page}
                 rowsPerPage={rowsPerPage}

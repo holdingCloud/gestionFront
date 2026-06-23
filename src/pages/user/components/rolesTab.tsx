@@ -20,6 +20,7 @@ export const RolesTab = () => {
         confirmDeleteOpen,
         savingModulos,
         creatingRole,
+        loadingRoles,
         formik,
         handleOpenModulos,
         handleSaveModulos,
@@ -55,6 +56,7 @@ export const RolesTab = () => {
                 onGestionarModulos={handleOpenModulos}
                 onDeleteRole={handleDeleteRole}
                 canManageModulos={canManageModulos}
+                loading={loadingRoles}
             />
 
             <ModulosDialog

@@ -15,6 +15,8 @@ export const useEmployee = () => {
 
     const [createModal, setCreateModal] = useState(false);
     const [hiddeButton, setHiddeButton] = useState(true);
+    const [loading, setLoading] = useState(false);
+    const [updatedId, setUpdatedId] = useState<number | null>(null);
     const [open, setOpen] = useState<boolean>(false);
     const [filter, setFilter] = useState<{ fullname: string, email: string }>({ fullname: "", email: "" });
     const [page, setPage] = useState(1);
@@ -55,6 +57,8 @@ export const useEmployee = () => {
 
         //updateEmployee(dataUpdate);
         enqueueSnackbar('Usuario actualizado exitosamente', { variant: 'success' });
+        setUpdatedId(deleteId);
+        setTimeout(() => setUpdatedId(null), 2500);
         resetForm();
         getEmployees(page, rowsPerPage, {});
     }
@@ -136,7 +140,8 @@ export const useEmployee = () => {
 
 
     useEffect(() => {
-        getEmployees(page, rowsPerPage, filter);
+        setLoading(true);
+        getEmployees(page, rowsPerPage, filter).finally(() => setLoading(false));
     }, [page, rowsPerPage, filter]);
 
     return {
@@ -151,6 +156,8 @@ export const useEmployee = () => {
         touched,
         hiddeButton,
         createModal,
+        loading,
+        updatedId,
         //Methods
         getEmployees,
         saveUpdate,

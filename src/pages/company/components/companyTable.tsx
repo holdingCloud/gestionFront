@@ -7,6 +7,7 @@ const cellSx = { px: 1, py: 0.75 };
 export const CompanyTable = ({
     companies,
     loading,
+    updatedId,
     count,
     page,
     rowsPerPage,
@@ -52,7 +53,10 @@ export const CompanyTable = ({
                             </TableCell>
                         </TableRow>
                     ) : companies?.length > 0 ? companies.map((row: any) => (
-                        <TableRow key={row.id}>
+                        <TableRow key={row.id} sx={{
+                            transition: 'background-color 0.6s ease',
+                            backgroundColor: row.id === updatedId ? 'rgba(16,185,129,0.10)' : undefined,
+                        }}>
                             <TableCell sx={cellSx}>
                                 <Typography variant="body2" fontWeight={600} noWrap sx={{ maxWidth: 200 }}>
                                     {row.name}

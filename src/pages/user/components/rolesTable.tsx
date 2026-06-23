@@ -1,5 +1,5 @@
 import {
-    Box, Table, TableBody, TableCell, TableHead, TableRow,
+    Box, CircularProgress, Table, TableBody, TableCell, TableHead, TableRow,
     Button, Typography, Tooltip,
 } from '@mui/material';
 import { EditOutlined, DeleteForeverOutlined } from '@mui/icons-material';
@@ -27,9 +27,10 @@ interface RolesTableProps {
     onGestionarModulos: (rol: RolConModulos) => void;
     onDeleteRole: (id: number) => void;
     canManageModulos: boolean;
+    loading?: boolean;
 }
 
-export const RolesTable = ({ rolesConModulos, onGestionarModulos, onDeleteRole, canManageModulos }: RolesTableProps) => {
+export const RolesTable = ({ rolesConModulos, onGestionarModulos, onDeleteRole, canManageModulos, loading }: RolesTableProps) => {
     const themeVariant = useThemeStore(state => state.theme);
     const t = THEME_TOKENS[themeVariant];
 
@@ -51,7 +52,15 @@ export const RolesTable = ({ rolesConModulos, onGestionarModulos, onDeleteRole, 
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {rolesConModulos.length === 0 ? (
+                    {loading ? (
+                        <TableRow>
+                            <TableCell colSpan={3} sx={{ py: 6, border: 0 }}>
+                                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                                    <CircularProgress />
+                                </Box>
+                            </TableCell>
+                        </TableRow>
+                    ) : rolesConModulos.length === 0 ? (
                         <TableRow>
                             <TableCell colSpan={3} sx={{ textAlign: 'center', py: 5, color: 'text.secondary' }}>
                                 No hay roles registrados
