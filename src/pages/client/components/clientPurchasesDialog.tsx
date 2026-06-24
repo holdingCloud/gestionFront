@@ -49,6 +49,8 @@ export const ClientPurchasesDialog = ({ open, clientId, clientName, onClose, onR
     const [total, setTotal] = useState(0);
     const [page, setPage] = useState(1);
     const [products, setProducts] = useState<Products[]>([]);
+    const [productsLoading, setProductsLoading] = useState(false);
+    const [productsError, setProductsError] = useState('');
     const [loading, setLoading] = useState(false);
     const [saving, setSaving] = useState(false);
     const [updatingId, setUpdatingId] = useState<number | null>(null);
@@ -93,9 +95,22 @@ export const ClientPurchasesDialog = ({ open, clientId, clientName, onClose, onR
         setStartDateVal(null);
         setEndDateVal(null);
         loadPurchases(1, emptyFilter);
-        ProductService.getProducts({ page: 1, limit: 1000 })
-            .then(res => setProducts(res.data ?? []))
-            .catch(() => setProducts([]));
+        setProductsLoading(true);
+        setProductsError('');
+        ProductService.getProducts({ page: 1, limit: 100 })
+            .then(res => {
+                const list = res.data ?? (res as any).products ?? [];
+                setProducts(Array.isArray(list) ? list : []);
+                if (!Array.isArray(list) || list.length === 0) {
+                    setProductsError('No hay productos disponibles');
+                }
+            })
+            .catch((err: Error) => {
+                setProducts([]);
+                setProductsError(err.message ?? 'Error al cargar productos');
+                enqueueSnackbar(`Productos: ${err.message ?? 'Error al cargar'}`, { variant: 'error' });
+            })
+            .finally(() => setProductsLoading(false));
     }, [open, clientId]);
 
     const hasPending = purchases.some(p => p.purchaseStatus === 'PENDIENTE');
@@ -198,26 +213,42 @@ export const ClientPurchasesDialog = ({ open, clientId, clientName, onClose, onR
                         <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 1.5 }}>
 
                             {/* Fila 1: Producto (2 cols) + Fecha (1 col) */}
-                            <FormControl size="small" sx={{ gridColumn: 'span 2' }} disabled={hasPending}>
-                                <InputLabel>Producto</InputLabel>
+                            <FormControl size="small" sx={{ gridColumn: 'span 2' }} disabled={hasPending || productsLoading} error={Boolean(productsError && products.length === 0)}>
+                                <InputLabel>
+                                    {productsLoading ? 'Cargando productos…' : 'Producto'}
+                                </InputLabel>
                                 <Select
                                     value={form.productsId}
-                                    label="Producto"
+                                    label={productsLoading ? 'Cargando productos…' : 'Producto'}
                                     onChange={e => { setForm(p => ({ ...p, productsId: e.target.value as string })); setFormError(''); }}
                                     renderValue={() => selectedProduct ? selectedProduct.name : ''}
+                                    endAdornment={
+                                        productsLoading
+                                            ? <CircularProgress size={16} sx={{ mr: 2 }} />
+                                            : undefined
+                                    }
                                 >
-                                    {products.length === 0
-                                        ? <ListSubheader>Sin productos disponibles</ListSubheader>
-                                        : products.map(p => (
-                                            <MenuItem key={p.id} value={String(p.id)}>
-                                                <Box>
-                                                    <Typography variant="body2" fontWeight={500}>{p.name}</Typography>
-                                                    <Typography variant="caption" color="text.secondary">{p.code}</Typography>
-                                                </Box>
-                                            </MenuItem>
-                                        ))
+                                    {productsLoading
+                                        ? <ListSubheader>Cargando…</ListSubheader>
+                                        : productsError && products.length === 0
+                                            ? <ListSubheader sx={{ color: 'error.main' }}>{productsError}</ListSubheader>
+                                            : products.length === 0
+                                                ? <ListSubheader>Sin productos disponibles</ListSubheader>
+                                                : products.map(p => (
+                                                    <MenuItem key={p.id} value={String(p.id)}>
+                                                        <Box>
+                                                            <Typography variant="body2" fontWeight={500}>{p.name}</Typography>
+                                                            <Typography variant="caption" color="text.secondary">{p.code}</Typography>
+                                                        </Box>
+                                                    </MenuItem>
+                                                ))
                                     }
                                 </Select>
+                                {productsError && products.length === 0 && (
+                                    <Typography variant="caption" color="error" sx={{ mt: 0.5, px: 0.5 }}>
+                                        {productsError}
+                                    </Typography>
+                                )}
                             </FormControl>
 
                             <DatePicker

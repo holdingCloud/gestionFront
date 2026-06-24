@@ -46,6 +46,11 @@ export const useClient = () => {
     const [stats, setStats] = useState({ total: 0, porLlamar: 0, vencidos: 0, contactados: 0 });
     const [isSavingUpdate, setIsSavingUpdate] = useState(false);
     const [updatedId, setUpdatedId] = useState<number | null>(null);
+    const [updatedIds, setUpdatedIds] = useState<Set<number>>(new Set());
+    const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+    const [bulkFreqOpen, setBulkFreqOpen] = useState(false);
+    const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+    const [isBulkSaving, setIsBulkSaving] = useState(false);
 
     const doFetch = async (pg: number, limit: number, filters: FilterParams) => {
         await getClients({
@@ -190,6 +195,75 @@ export const useClient = () => {
         setPurchasesOpen(true);
     };
 
+    const handleSelectRow = (id: number, checked: boolean) => {
+        setSelectedIds(prev => {
+            const next = new Set(prev);
+            checked ? next.add(id) : next.delete(id);
+            return next;
+        });
+    };
+
+    const handleSelectAll = (checked: boolean) =>
+        setSelectedIds(checked ? new Set(allClients.map(c => c.id)) : new Set());
+
+    const clearSelection = () => setSelectedIds(new Set());
+    const openBulkFreqModal = () => setBulkFreqOpen(true);
+    const closeBulkFreqModal = () => setBulkFreqOpen(false);
+    const openBulkDeleteModal = () => setBulkDeleteOpen(true);
+    const closeBulkDeleteModal = () => setBulkDeleteOpen(false);
+
+    const bulkDeleteClients = async () => {
+        setIsBulkSaving(true);
+        const ids = Array.from(selectedIds);
+        try {
+            const results = await Promise.allSettled(
+                ids.map(id => deleteClient(id))
+            );
+            const succeeded = ids.filter((_, i) => results[i].status === 'fulfilled');
+            const failedCount = ids.length - succeeded.length;
+            const newPage = allClients.length - succeeded.length <= 0 && page > 0 ? page - 1 : page;
+            setPage(newPage);
+            await doFetch(newPage, rowsPerPage, { search: searchFilter, contactStatus: statusFilter, communeId: communeIdFilter, companyId: companyIdFilter });
+            await fetchStats();
+            if (succeeded.length > 0) {
+                enqueueSnackbar(`${succeeded.length} cliente(s) eliminado(s) exitosamente`, { variant: 'success' });
+            }
+            if (failedCount > 0) {
+                enqueueSnackbar(`${failedCount} cliente(s) no pudieron ser eliminados`, { variant: 'error' });
+            }
+            clearSelection();
+            closeBulkDeleteModal();
+        } finally {
+            setIsBulkSaving(false);
+        }
+    };
+
+    const bulkUpdateFrequency = async (frequency: number) => {
+        setIsBulkSaving(true);
+        const ids = Array.from(selectedIds);
+        try {
+            const results = await Promise.allSettled(
+                ids.map(id => updateClient(id, { frequency } as ClientBody))
+            );
+            const succeeded = ids.filter((_, i) => results[i].status === 'fulfilled');
+            const failedCount = ids.length - succeeded.length;
+            await doFetch(page, rowsPerPage, { search: searchFilter, contactStatus: statusFilter, communeId: communeIdFilter, companyId: companyIdFilter });
+            await fetchStats();
+            if (succeeded.length > 0) {
+                setUpdatedIds(new Set(succeeded));
+                setTimeout(() => setUpdatedIds(new Set()), 2500);
+                enqueueSnackbar(`${succeeded.length} cliente(s) actualizados con frecuencia de ${frequency} días`, { variant: 'success' });
+            }
+            if (failedCount > 0) {
+                enqueueSnackbar(`${failedCount} cliente(s) no pudieron ser actualizados`, { variant: 'error' });
+            }
+            clearSelection();
+            closeBulkFreqModal();
+        } finally {
+            setIsBulkSaving(false);
+        }
+    };
+
     const {
         handleSubmit,
         errors,
@@ -293,5 +367,19 @@ export const useClient = () => {
         dialogClientName,
         setPurchasesOpen,
         handlePurchases,
+        updatedIds,
+        selectedIds,
+        bulkFreqOpen,
+        bulkDeleteOpen,
+        isBulkSaving,
+        handleSelectRow,
+        handleSelectAll,
+        clearSelection,
+        openBulkFreqModal,
+        closeBulkFreqModal,
+        bulkUpdateFrequency,
+        openBulkDeleteModal,
+        closeBulkDeleteModal,
+        bulkDeleteClients,
     };
 };
