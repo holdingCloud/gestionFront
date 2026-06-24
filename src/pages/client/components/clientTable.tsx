@@ -2,7 +2,7 @@ import { EditOutlined, DeleteForeverOutlined } from '@mui/icons-material';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import {
-    Box, CircularProgress, Link, TableHead, TableRow, TableCell,
+    Box, Checkbox, CircularProgress, Link, TableHead, TableRow, TableCell,
     TableBody, Tooltip, Chip, IconButton, Typography, Avatar,
 } from '@mui/material';
 import { DataTable } from '../../../components';
@@ -85,6 +85,10 @@ interface ClientTableProps {
     clients: ClientResponse[];
     loading: boolean;
     updatedId?: number | null;
+    updatedIds?: Set<number>;
+    selectedIds: Set<number>;
+    onSelectRow: (id: number, checked: boolean) => void;
+    onSelectAll: (checked: boolean) => void;
     handleUpdate: (row: ClientResponse) => void;
     handleDelete: (id: number) => void;
     handlePurchases: (id: number, name: string) => void;
@@ -93,7 +97,8 @@ interface ClientTableProps {
 
 export const ClientTable = ({
     count, page, rowsPerPage, handleChangePage, handleChangeRowsPerPage,
-    clients, loading, updatedId, handleUpdate, handleDelete, handlePurchases, onAiMessage,
+    clients, loading, updatedId, updatedIds, selectedIds, onSelectRow, onSelectAll,
+    handleUpdate, handleDelete, handlePurchases, onAiMessage,
 }: ClientTableProps) => {
     const themeVariant = useThemeStore(state => state.theme);
     const t = THEME_TOKENS[themeVariant];
@@ -130,6 +135,15 @@ export const ClientTable = ({
             >
                 <TableHead>
                     <TableRow>
+                        <TableCell padding="checkbox" sx={{ ...headSx, width: 40, pl: 1 }}>
+                            <Checkbox
+                                size="small"
+                                indeterminate={selectedIds.size > 0 && selectedIds.size < clients.length}
+                                checked={clients.length > 0 && selectedIds.size === clients.length}
+                                onChange={e => onSelectAll(e.target.checked)}
+                                sx={{ color: t.border, '&.Mui-checked': { color: t.primary }, '&.MuiCheckbox-indeterminate': { color: t.primary } }}
+                            />
+                        </TableCell>
                         <TableCell sx={{ ...headSx, width: '100%', minWidth: 180 }}>Cliente</TableCell>
                         <TableCell sx={{ ...headSx, minWidth: 100, whiteSpace: 'nowrap' }}>Referencia</TableCell>
                         <TableCell sx={{ ...headSx, minWidth: 148, whiteSpace: 'nowrap' }}>Teléfono</TableCell>
@@ -144,7 +158,7 @@ export const ClientTable = ({
                 <TableBody>
                     {loading ? (
                         <TableRow>
-                            <TableCell colSpan={9} sx={{ py: 6, border: 0 }}>
+                            <TableCell colSpan={10} sx={{ py: 6, border: 0 }}>
                                 <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                                     <CircularProgress />
                                 </Box>
@@ -160,9 +174,21 @@ export const ClientTable = ({
                                 sx={{
                                     '&:last-child td, &:last-child th': { borderBottom: 0 },
                                     transition: 'background-color 0.6s ease',
-                                    backgroundColor: row.id === updatedId ? 'rgba(16,185,129,0.10)' : undefined,
+                                    backgroundColor:
+                                        updatedIds?.has(row.id) || row.id === updatedId
+                                            ? 'rgba(16,185,129,0.10)'
+                                            : undefined,
                                 }}
                             >
+                                {/* CHECKBOX */}
+                                <TableCell padding="checkbox" sx={{ pl: 1, ...cellSx }}>
+                                    <Checkbox
+                                        size="small"
+                                        checked={selectedIds.has(row.id)}
+                                        onChange={e => onSelectRow(row.id, e.target.checked)}
+                                        sx={{ color: t.border, '&.Mui-checked': { color: t.primary } }}
+                                    />
+                                </TableCell>
                                 {/* CLIENTE */}
                                 <TableCell component="th" scope="row" sx={cellSx}>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
@@ -324,7 +350,7 @@ export const ClientTable = ({
                         );
                     }) : (
                         <TableRow>
-                            <TableCell colSpan={9} sx={{ textAlign: 'center', py: 5, color: 'text.secondary', border: 0 }}>
+                            <TableCell colSpan={10} sx={{ textAlign: 'center', py: 5, color: 'text.secondary', border: 0 }}>
                                 No se encontraron datos
                             </TableCell>
                         </TableRow>
