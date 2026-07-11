@@ -25,9 +25,17 @@ function getInitials(name: string): string {
 }
 
 const STATUS_CHIP_SX: Record<string, object> = {
+    NUEVO:      { bgcolor: '#eff6ff', color: '#1d4ed8', fontWeight: 700, border: '1px solid #bfdbfe' },
     LLAMAR:     { bgcolor: '#fff7ed', color: '#c2410c', fontWeight: 700, border: '1px solid #fed7aa' },
     CONTACTADO: { bgcolor: '#f0fdf4', color: '#15803d', fontWeight: 700, border: '1px solid #bbf7d0' },
     VENCIDO:    { bgcolor: '#fff1f2', color: '#be123c', fontWeight: 700, border: '1px solid #fecdd3' },
+};
+
+const STATUS_LABELS: Record<string, string> = {
+    NUEVO: 'Nuevo',
+    LLAMAR: 'Por llamar',
+    CONTACTADO: 'Contactado',
+    VENCIDO: 'Vencido',
 };
 
 function formatAddress(dir: ClientResponse['direccion']): string {
@@ -98,7 +106,7 @@ interface ClientTableProps {
 export const ClientTable = ({
     count, page, rowsPerPage, handleChangePage, handleChangeRowsPerPage,
     clients, loading, updatedId, updatedIds, selectedIds, onSelectRow, onSelectAll,
-    handleUpdate, handleDelete, handlePurchases, onAiMessage,
+    handleUpdate, handleDelete, handlePurchases,
 }: ClientTableProps) => {
     const themeVariant = useThemeStore(state => state.theme);
     const t = THEME_TOKENS[themeVariant];
@@ -255,7 +263,7 @@ export const ClientTable = ({
                                 {/* ESTADO */}
                                 <TableCell sx={cellSx}>
                                     <Chip
-                                        label={row.contactStatus ?? '-'}
+                                        label={STATUS_LABELS[row.contactStatus] ?? row.contactStatus ?? '-'}
                                         size="small"
                                         sx={{
                                             borderRadius: '20px',
@@ -305,7 +313,7 @@ export const ClientTable = ({
                                 {/* ACCIONES */}
                                 <TableCell sx={cellSx}>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                        {/* Mensaje IA */}
+                                        {/* Mensaje IA — oculto temporalmente
                                         <Box
                                             onClick={() => onAiMessage(row)}
                                             sx={{
@@ -324,6 +332,7 @@ export const ClientTable = ({
                                             </svg>
                                             Mensaje IA
                                         </Box>
+                                        */}
                                         {/* Edit */}
                                         <Tooltip title="Editar">
                                             <IconButton

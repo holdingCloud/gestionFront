@@ -7,6 +7,7 @@ import { useThemeStore, THEME_TOKENS } from '../../../store/theme/theme.store';
 
 const STATUS_FILTERS = [
     { value: '', label: 'Todos' },
+    { value: 'NUEVO', label: 'Nuevos' },
     { value: 'LLAMAR', label: 'Por llamar' },
     { value: 'VENCIDO', label: 'Vencidos' },
     { value: 'CONTACTADO', label: 'Contactados' },

@@ -7,7 +7,10 @@ import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import PlaceOutlinedIcon from "@mui/icons-material/PlaceOutlined";
 import TuneOutlinedIcon from "@mui/icons-material/TuneOutlined";
 import { useEffect, useState } from "react";
+import { useFormik } from "formik";
+import * as Yup from 'yup';
 import { LocationService, Region, Commune } from "../../../services";
+import { ClientBody, ClientResponse } from "../../../interfaces/client.interface";
 
 const VALPARAISO_NAME = 'Región de Valparaíso';
 
@@ -23,6 +26,52 @@ const formatChileanPhone = (raw: string): string => {
     return `+56 ${first} ${rest}`;
 };
 
+const EMPTY_VALUES = {
+    fullname: '',
+    email: '',
+    phone: '',
+    calle: '',
+    numero: '',
+    departamento: '',
+    referencia: '',
+    communeId: '' as any,
+    frequency: '' as any,
+    companyId: '' as any,
+};
+
+const mapClientToValues = (c: ClientResponse) => ({
+    fullname: c.fullname ?? '',
+    email: c.email ?? '',
+    phone: c.phone ?? '',
+    calle: c.direccion?.calle ?? '',
+    numero: c.direccion?.numero ?? '',
+    departamento: c.direccion?.departamento ?? '',
+    referencia: c.direccion?.referencia ?? '',
+    communeId: (c.direccion?.communeId ?? '') as any,
+    frequency: (c.frequency ?? '') as any,
+    companyId: (c.companyId ?? '') as any,
+});
+
+const validationSchema = Yup.object({
+    fullname: Yup.string().min(3, 'Mínimo 3 caracteres').max(100, 'Máximo 100 caracteres').required('Requerido'),
+    email: Yup.string().email('Debe ser un email válido').required('Requerido'),
+    phone: Yup.string()
+        .matches(/^\+56 9 \d{8}$/, 'Formato inválido. Ej: +56 9 95720483')
+        .required('Requerido'),
+    calle: Yup.string().required('Requerido'),
+});
+
+const buildDireccionPrincipal = (vals: typeof EMPTY_VALUES) => {
+    if (!vals.calle) return undefined;
+    return {
+        calle: vals.calle,
+        ...(vals.numero ? { numero: vals.numero } : {}),
+        ...(vals.departamento ? { departamento: vals.departamento } : {}),
+        ...(vals.referencia ? { referencia: vals.referencia } : {}),
+        ...(vals.communeId ? { communeId: Number(vals.communeId) } : {}),
+    };
+};
+
 const SectionLabel = ({ icon, label }: { icon: React.ReactNode; label: string }) => (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 1.5, mt: 0.5 }}>
         {icon}
@@ -33,26 +82,68 @@ const SectionLabel = ({ icon, label }: { icon: React.ReactNode; label: string })
     </Box>
 );
 
+interface ClientFormProps {
+    onSetCreateModal: (action: boolean) => void;
+    cancelUpdate: () => void;
+    companies: any[];
+    hiddeButton: boolean;
+    editingClient: ClientResponse | null;
+    onCreate: (payload: ClientBody) => Promise<void>;
+    onUpdate: (id: number, payload: ClientBody) => Promise<void>;
+}
+
 export const ClientForm = ({
     onSetCreateModal,
-    handleSubmit,
-    values,
-    touched,
-    handleChange,
-    handleBlur,
-    setFieldValue,
-    errors,
-    hiddeButton,
-    saveUpdate,
     cancelUpdate,
     companies,
-    isSaving,
-}: any) => {
+    hiddeButton,
+    editingClient,
+    onCreate,
+    onUpdate,
+}: ClientFormProps) => {
     const [regions, setRegions] = useState<Region[]>([]);
     const [valparaisoRegion, setValparaisoRegion] = useState<Region | null>(null);
     const [communes, setCommunes] = useState<Commune[]>([]);
     const [selectedCommune, setSelectedCommune] = useState<Commune | null>(null);
     const [loadingCommunes, setLoadingCommunes] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+
+    const {
+        values, errors, touched,
+        handleChange, handleBlur, setFieldValue, handleSubmit,
+    } = useFormik({
+        initialValues: !hiddeButton && editingClient ? mapClientToValues(editingClient) : EMPTY_VALUES,
+        enableReinitialize: true,
+        validationSchema,
+        validateOnChange: false,
+        validateOnBlur: true,
+        onSubmit: async (vals) => {
+            setIsSaving(true);
+            try {
+                const freq = vals.frequency !== '' && vals.frequency !== undefined ? Number(vals.frequency) : undefined;
+                const compId = vals.companyId !== '' && vals.companyId !== undefined ? Number(vals.companyId) : undefined;
+
+                const payload: ClientBody = {
+                    fullname: vals.fullname,
+                    email: vals.email,
+                    phone: vals.phone,
+                    ...(freq ? { frequency: freq } : {}),
+                    ...(compId ? { companyId: compId } : {}),
+                };
+
+                const dir = buildDireccionPrincipal(vals);
+                if (dir) payload.direccionPrincipal = dir;
+
+                if (!hiddeButton && editingClient) {
+                    await onUpdate(editingClient.id, payload);
+                } else {
+                    await onCreate(payload);
+                }
+            } finally {
+                setIsSaving(false);
+            }
+        },
+    });
 
     useEffect(() => {
         LocationService.getRegions().then(data => {
@@ -232,7 +323,7 @@ export const ClientForm = ({
                             {isSaving ? 'Guardando registro...' : 'Guardar'}
                         </Button>
                     ) : (
-                        <Button variant="contained" type="button" color="info" onClick={saveUpdate} disabled={isSaving}
+                        <Button variant="contained" type="submit" color="info" disabled={isSaving}
                             startIcon={isSaving ? <CircularProgress size={16} color="inherit" /> : undefined}
                         >
                             {isSaving ? 'Guardando registro...' : 'Guardar cambios'}
