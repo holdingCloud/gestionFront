@@ -222,11 +222,6 @@ export const ClientPurchasesDialog = ({ open, clientId, clientName, onClose, onR
                                     label={productsLoading ? 'Cargando productos…' : 'Producto'}
                                     onChange={e => { setForm(p => ({ ...p, productsId: e.target.value as string })); setFormError(''); }}
                                     renderValue={() => selectedProduct ? selectedProduct.name : ''}
-                                    endAdornment={
-                                        productsLoading
-                                            ? <CircularProgress size={16} sx={{ mr: 2 }} />
-                                            : undefined
-                                    }
                                 >
                                     {productsLoading
                                         ? <ListSubheader>Cargando…</ListSubheader>

@@ -1,10 +1,8 @@
 import { ChangeEvent, MouseEvent, useEffect, useState } from "react";
 import { useSnackbar } from 'notistack';
-import { useFormik } from "formik";
-import * as Yup from 'yup';
 import { useClientStore, useCompanyStore } from "../../../store";
 import { ClientService } from "../../../services";
-import { ClientBody } from "../../../interfaces/client.interface";
+import { ClientBody, ClientResponse } from "../../../interfaces/client.interface";
 
 interface FilterParams {
     search?: string;
@@ -43,8 +41,8 @@ export const useClient = () => {
     const communeIdFilter = undefined as number | undefined;
     const [companyIdFilter, setCompanyIdFilter] = useState<number | undefined>(undefined);
 
-    const [stats, setStats] = useState({ total: 0, porLlamar: 0, vencidos: 0, contactados: 0 });
-    const [isSavingUpdate, setIsSavingUpdate] = useState(false);
+    const [stats, setStats] = useState({ total: 0, nuevos: 0, porLlamar: 0, vencidos: 0, contactados: 0 });
+    const [editingClient, setEditingClient] = useState<ClientResponse | null>(null);
     const [updatedId, setUpdatedId] = useState<number | null>(null);
     const [updatedIds, setUpdatedIds] = useState<Set<number>>(new Set());
     const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
@@ -65,14 +63,16 @@ export const useClient = () => {
 
     const fetchStats = async () => {
         try {
-            const [all, llamar, vencido, contactado] = await Promise.all([
+            const [all, nuevo, llamar, vencido, contactado] = await Promise.all([
                 ClientService.getClients({ page: 1, limit: 1 }),
+                ClientService.getClients({ page: 1, limit: 1, contactStatus: 'NUEVO' }),
                 ClientService.getClients({ page: 1, limit: 1, contactStatus: 'LLAMAR' }),
                 ClientService.getClients({ page: 1, limit: 1, contactStatus: 'VENCIDO' }),
                 ClientService.getClients({ page: 1, limit: 1, contactStatus: 'CONTACTADO' }),
             ]);
             setStats({
                 total: all.total,
+                nuevos: nuevo.total,
                 porLlamar: llamar.total,
                 vencidos: vencido.total,
                 contactados: contactado.total,
@@ -106,66 +106,47 @@ export const useClient = () => {
     };
 
     const onSetCreateModal = (action: boolean) => {
+        // Al abrir para "Nuevo cliente" reiniciamos el modo edición.
+        if (action) {
+            setHiddeButton(true);
+            setEditingClient(null);
+        }
         setCreateModal(action);
     };
 
-    const handleUpdate = ({ ...data }: any) => {
+    const handleUpdate = (data: ClientResponse) => {
         setHiddeButton(false);
-        setCreateModal(true);
+        setEditingClient(data);
         setDeleteId(data.id);
-        setValues({
-            fullname: data.fullname ?? '',
-            email: data.email ?? '',
-            phone: data.phone ?? '',
-            calle: data.direccion?.calle ?? '',
-            numero: data.direccion?.numero ?? '',
-            departamento: data.direccion?.departamento ?? '',
-            referencia: data.direccion?.referencia ?? '',
-            communeId: data.direccion?.communeId ?? '',
-            frequency: data.frequency ?? '',
-            companyId: data.companyId ?? '',
-        });
+        setCreateModal(true);
     };
 
     const cancelUpdate = () => {
         setHiddeButton(true);
-        resetForm();
+        setEditingClient(null);
     };
 
-    const buildDireccionPrincipal = (vals: typeof values) => {
-        if (!vals.calle) return undefined;
-        return {
-            calle: vals.calle,
-            ...(vals.numero ? { numero: vals.numero } : {}),
-            ...(vals.departamento ? { departamento: vals.departamento } : {}),
-            ...(vals.referencia ? { referencia: vals.referencia } : {}),
-            ...(vals.communeId ? { communeId: Number(vals.communeId) } : {}),
-        };
+    // Alta de cliente — el formulario arma el payload y aquí orquestamos la
+    // recarga de la tabla, estadísticas y cierre del modal.
+    const submitCreate = async (payload: ClientBody) => {
+        await createClient(payload as any);
+        setPage(0);
+        await doFetch(0, rowsPerPage, { search: searchFilter, contactStatus: statusFilter, communeId: communeIdFilter, companyId: companyIdFilter });
+        await fetchStats();
+        enqueueSnackbar('Cliente creado exitosamente', { variant: 'success' });
+        setCreateModal(false);
     };
 
-    const saveUpdate = async () => {
-        setIsSavingUpdate(true);
-        try {
-            const payload: ClientBody = {
-                fullname: values.fullname,
-                email: values.email,
-                phone: values.phone,
-                ...(values.companyId ? { companyId: Number(values.companyId) } : {}),
-                ...(values.frequency !== '' && values.frequency !== undefined ? { frequency: Number(values.frequency) } : {}),
-            };
-            const dir = buildDireccionPrincipal(values);
-            if (dir) payload.direccionPrincipal = dir;
-
-            await updateClient(deleteId, payload);
-            await doFetch(page, rowsPerPage, { search: searchFilter, contactStatus: statusFilter, communeId: communeIdFilter, companyId: companyIdFilter });
-            await fetchStats();
-            enqueueSnackbar('Cliente actualizado exitosamente', { variant: 'success' });
-            setUpdatedId(deleteId);
-            setTimeout(() => setUpdatedId(null), 2500);
-            resetForm();
-        } finally {
-            setIsSavingUpdate(false);
-        }
+    const submitUpdate = async (id: number, payload: ClientBody) => {
+        await updateClient(id, payload);
+        await doFetch(page, rowsPerPage, { search: searchFilter, contactStatus: statusFilter, communeId: communeIdFilter, companyId: companyIdFilter });
+        await fetchStats();
+        enqueueSnackbar('Cliente actualizado exitosamente', { variant: 'success' });
+        setUpdatedId(id);
+        setTimeout(() => setUpdatedId(null), 2500);
+        setCreateModal(false);
+        setEditingClient(null);
+        setHiddeButton(true);
     };
 
     const onClose = async (action: boolean) => {
@@ -264,64 +245,6 @@ export const useClient = () => {
         }
     };
 
-    const {
-        handleSubmit,
-        errors,
-        touched,
-        values,
-        handleBlur,
-        handleChange,
-        setValues,
-        resetForm,
-        setFieldValue,
-        isSubmitting,
-    } = useFormik({
-        initialValues: {
-            fullname: '',
-            email: '',
-            phone: '',
-            calle: '',
-            numero: '',
-            departamento: '',
-            referencia: '',
-            communeId: '' as any,
-            frequency: '' as any,
-            companyId: '' as any,
-        },
-        onSubmit: async (vals, { resetForm }) => {
-            const freq = vals.frequency !== '' && vals.frequency !== undefined ? Number(vals.frequency) : undefined;
-            const compId = vals.companyId !== '' && vals.companyId !== undefined ? Number(vals.companyId) : undefined;
-
-            const payload: ClientBody = {
-                fullname: vals.fullname,
-                email: vals.email,
-                phone: vals.phone,
-                ...(freq ? { frequency: freq } : {}),
-                ...(compId ? { companyId: compId } : {}),
-            };
-
-            const dir = buildDireccionPrincipal(vals);
-            if (dir) payload.direccionPrincipal = dir;
-
-            await createClient(payload as any);
-            setPage(0);
-            await doFetch(0, rowsPerPage, { search: searchFilter, contactStatus: statusFilter, communeId: communeIdFilter, companyId: companyIdFilter });
-            await fetchStats();
-            enqueueSnackbar('Cliente creado exitosamente', { variant: 'success' });
-            resetForm();
-        },
-        validationSchema: Yup.object({
-            fullname: Yup.string().min(3, 'Mínimo 3 caracteres').max(100, 'Máximo 100 caracteres').required('Requerido'),
-            email: Yup.string().email('Debe ser un email válido').required('Requerido'),
-            phone: Yup.string()
-                .matches(/^\+56 9 \d{8}$/, 'Formato inválido. Ej: +56 9 95720483')
-                .required('Requerido'),
-            calle: Yup.string().required('Requerido'),
-        }),
-        validateOnChange: false,
-        validateOnBlur: true,
-    });
-
     useEffect(() => {
         doFetch(0, rowsPerPage, {});
         getCompanies();
@@ -337,22 +260,16 @@ export const useClient = () => {
         loading,
         page,
         open,
-        values,
         count,
         stats,
-        errors,
-        touched,
         rowsPerPage,
         createModal,
         hiddeButton,
         companies,
-        isSaving: isSubmitting || isSavingUpdate,
+        editingClient,
         updatedId,
-        handleSubmit,
-        handleChange,
-        handleBlur,
-        setFieldValue,
-        saveUpdate,
+        submitCreate,
+        submitUpdate,
         handleUpdate,
         cancelUpdate,
         handleChangePage,
