@@ -32,19 +32,14 @@ const ClientPage = () => {
         loading,
         page,
         open,
-        values,
         count,
         stats,
-        errors,
-        touched,
         rowsPerPage,
         createModal,
         hiddeButton,
-        handleSubmit,
-        handleChange,
-        handleBlur,
-        setFieldValue,
-        saveUpdate,
+        editingClient,
+        submitCreate,
+        submitUpdate,
         handleUpdate,
         cancelUpdate,
         handleChangePage,
@@ -60,7 +55,6 @@ const ClientPage = () => {
         setPurchasesOpen,
         handlePurchases,
         companies,
-        isSaving,
         updatedId,
         updatedIds,
         selectedIds,
@@ -85,7 +79,7 @@ const ClientPage = () => {
             {/* Stat cards — 4-column grid */}
             <Box sx={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(4, 1fr)',
+                gridTemplateColumns: 'repeat(5, 1fr)',
                 gap: '14px',
                 px: '8px',
                 pt: '8px',
@@ -93,6 +87,7 @@ const ClientPage = () => {
             }}>
                 <ClientStatCards
                     total={stats.total}
+                    nuevos={stats.nuevos}
                     porLlamar={stats.porLlamar}
                     vencidos={stats.vencidos}
                     contactados={stats.contactados}
@@ -197,18 +192,12 @@ const ClientPage = () => {
             >
                 <ClientForm
                     onSetCreateModal={onSetCreateModal}
-                    handleSubmit={handleSubmit}
-                    values={values}
-                    touched={touched}
-                    handleChange={handleChange}
-                    handleBlur={handleBlur}
-                    setFieldValue={setFieldValue}
-                    errors={errors}
                     hiddeButton={hiddeButton}
-                    saveUpdate={saveUpdate}
+                    editingClient={editingClient}
+                    onCreate={submitCreate}
+                    onUpdate={submitUpdate}
                     cancelUpdate={cancelUpdate}
                     companies={companies}
-                    isSaving={isSaving}
                 />
             </CreateModal>
 

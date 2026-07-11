@@ -1,5 +1,9 @@
 export type FrequencyStatus = 'NUEVO' | 'EN_PLAZO' | 'POR_VENCER' | 'VENCIDO';
 
+// Estado de contacto del cliente. NUEVO es el estado por defecto y derivado por el
+// sistema (cliente sin compras finalizadas); no puede asignarse manualmente.
+export type ContactStatus = 'NUEVO' | 'CONTACTADO' | 'LLAMAR' | 'VENCIDO';
+
 export interface ClientProductFrequency {
     id: number;
     clientsId: number;
@@ -45,7 +49,7 @@ export interface ClientResponse {
     direccionId?: number | null;
     direccion?: DireccionData | null;
     available: boolean;
-    contactStatus: string;
+    contactStatus: ContactStatus;
     frequency: number | null;
     createdAt: string;
     updatedAt: string;
@@ -69,7 +73,6 @@ export interface ClientBody {
     email: string;
     companyId?: number;
     frequency?: number;
-    contactStatus?: string;
     direccionPrincipal?: DireccionPrincipalBody;
 }
 

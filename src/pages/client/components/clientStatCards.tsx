@@ -49,17 +49,18 @@ const StatCard = ({ label, value, iconPath, iconBg, iconColor }: StatCardProps) 
 
 interface ClientStatCardsProps {
     total: number;
+    nuevos: number;
     porLlamar: number;
     vencidos: number;
     contactados: number;
     loading?: boolean;
 }
 
-export const ClientStatCards = ({ total, porLlamar, vencidos, contactados, loading }: ClientStatCardsProps) => {
+export const ClientStatCards = ({ total, nuevos, porLlamar, vencidos, contactados, loading }: ClientStatCardsProps) => {
     if (loading) {
         return (
             <>
-                {[0, 1, 2, 3].map(i => (
+                {[0, 1, 2, 3, 4].map(i => (
                     <Skeleton key={i} variant="rounded" height={120} sx={{ borderRadius: '18px' }} />
                 ))}
             </>
@@ -74,6 +75,13 @@ export const ClientStatCards = ({ total, porLlamar, vencidos, contactados, loadi
                 iconPath="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8 M22 21v-2a4 4 0 0 0-3-3.87 M16 3.13a4 4 0 0 1 0 7.75"
                 iconBg="rgba(14,159,140,.13)"
                 iconColor="#0e9f8c"
+            />
+            <StatCard
+                label="Nuevos"
+                value={nuevos}
+                iconPath="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8 M19 8v6 M22 11h-6"
+                iconBg="rgba(37,99,235,.12)"
+                iconColor="#2563eb"
             />
             <StatCard
                 label="Por llamar"
