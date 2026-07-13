@@ -10,9 +10,9 @@ import {
     Box,
     IconButton,
 } from '@mui/material';
-import { KeyboardArrowLeft, KeyboardArrowRight } from '@mui/icons-material';
+import { KeyboardArrowLeft, KeyboardArrowRight, FirstPage, LastPage } from '@mui/icons-material';
 
-const WINDOW = 6; // cuántos números de página mostrar a la vez
+const WINDOW = 9; // cuántos números de página mostrar a la vez
 
 function PaginationActions({ count, page, rowsPerPage, onPageChange }: any) {
     const totalPages = Math.max(1, Math.ceil(count / rowsPerPage));
@@ -27,6 +27,10 @@ function PaginationActions({ count, page, rowsPerPage, onPageChange }: any) {
 
     return (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, ml: 2 }}>
+            <IconButton size="small" onClick={(e) => onPageChange(e, 0)} disabled={page === 0}>
+                <FirstPage fontSize="small" />
+            </IconButton>
+
             <IconButton size="small" onClick={(e) => onPageChange(e, page - 1)} disabled={page === 0}>
                 <KeyboardArrowLeft fontSize="small" />
             </IconButton>
@@ -56,6 +60,10 @@ function PaginationActions({ count, page, rowsPerPage, onPageChange }: any) {
 
             <IconButton size="small" onClick={(e) => onPageChange(e, page + 1)} disabled={current >= totalPages}>
                 <KeyboardArrowRight fontSize="small" />
+            </IconButton>
+
+            <IconButton size="small" onClick={(e) => onPageChange(e, totalPages - 1)} disabled={current >= totalPages}>
+                <LastPage fontSize="small" />
             </IconButton>
         </Box>
     );
