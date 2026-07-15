@@ -9,8 +9,10 @@ export const useUser = () => {
 
     const users = useUserStore(state => state.users);
     const count = useUserStore(state => state.count);
+    const activeCount = useUserStore(state => state.activeCount);
     const roles = useUserStore(state => state.roles);
     const getUsers = useUserStore(state => state.getUsers);
+    const getActiveCount = useUserStore(state => state.getActiveCount);
     const getRoles = useUserStore(state => state.getRoles);
     const createUser = useUserStore(state => state.createUser);
     const deleteUser = useUserStore(state => state.deleteUser);
@@ -30,8 +32,14 @@ export const useUser = () => {
     const [isSavingUpdate, setIsSavingUpdate] = useState(false);
     const [loading, setLoading] = useState(false);
     const [updatedId, setUpdatedId] = useState<number | null>(null);
+    const [onlyOnline, setOnlyOnline] = useState(false);
 
     const handleClickShowPassword = () => setShowPassword(prev => !prev);
+
+    const toggleOnlyOnline = () => setOnlyOnline(prev => !prev);
+
+    // Filtro "Solo en sesión": actúa sobre la página cargada (GET /users no filtra por isLoged)
+    const displayedUsers = onlyOnline ? users.filter(u => u.isLoged) : users;
 
     const handleChangePage = (_: MouseEvent<HTMLButtonElement> | null, newPage: number) => {
         setPage(newPage);
@@ -162,6 +170,17 @@ export const useUser = () => {
     useEffect(() => {
         setLoading(true);
         getUsers(page, rowsPerPage, filter).finally(() => setLoading(false));
+        getActiveCount();
+    }, [page, rowsPerPage, filter]);
+
+    // Refresco en vivo: las sesiones Redis expiran solas (2h) y otros usuarios entran/salen.
+    // Refresco silencioso (sin setLoading) para no parpadear.
+    useEffect(() => {
+        const id = setInterval(() => {
+            getUsers(page, rowsPerPage, filter);
+            getActiveCount();
+        }, 60_000);
+        return () => clearInterval(id);
     }, [page, rowsPerPage, filter]);
 
     useEffect(() => {
@@ -169,11 +188,14 @@ export const useUser = () => {
     }, []);
 
     return {
-        users,
+        users: displayedUsers,
         page,
         open,
         values,
         count,
+        activeCount,
+        onlyOnline,
+        toggleOnlyOnline,
         errors,
         touched,
         rowsPerPage,

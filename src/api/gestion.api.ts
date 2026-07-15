@@ -21,7 +21,8 @@ gestionApi.interceptors.request.use(
 gestionApi.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response?.status === 401) {
+        // Evita bucle: no re-disparar logout si la petición que falló fue el propio /auth/logout
+        if (error.response?.status === 401 && !error.config?.url?.includes('/auth/logout')) {
             useAuthStore.getState().logoutUser();
         }
         return Promise.reject(error);

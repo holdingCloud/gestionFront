@@ -31,6 +31,9 @@ const UserPage = () => {
         open,
         values,
         count,
+        activeCount,
+        onlyOnline,
+        toggleOnlyOnline,
         errors,
         touched,
         rowsPerPage,
@@ -92,6 +95,9 @@ const UserPage = () => {
                 <FilterUserForm
                     handleFilter={handleFilter}
                     onSetCreateModal={onSetCreateModal}
+                    activeCount={activeCount}
+                    onlyOnline={onlyOnline}
+                    toggleOnlyOnline={toggleOnlyOnline}
                 />
 
                 <UserTable
