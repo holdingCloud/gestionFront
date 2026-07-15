@@ -6,9 +6,11 @@ import { Users, UserBody, UserFilter, Role, RoleBody, RolConModulos, ModuloType 
 export interface UserState {
     users: Users[];
     count: number;
+    activeCount: number;
     roles: Role[];
     rolesConModulos: RolConModulos[];
     getUsers: (page: number, limit: number, filter: UserFilter) => Promise<void>;
+    getActiveCount: () => Promise<void>;
     createUser: (user: UserBody) => Promise<void>;
     deleteUser: (id: number) => Promise<void>;
     changeStatus: (id: number, status: boolean) => Promise<void>;
@@ -23,6 +25,7 @@ export interface UserState {
 const storeApi: StateCreator<UserState, [["zustand/devtools", never]]> = (set) => ({
     users: [],
     count: 0,
+    activeCount: 0,
     roles: [],
     rolesConModulos: [],
     getUsers: async (page, limit, filter) => {
@@ -31,6 +34,16 @@ const storeApi: StateCreator<UserState, [["zustand/devtools", never]]> = (set) =
             set({ users: data, count: total });
         } catch {
             set({ users: [], count: 0 });
+        }
+    },
+    // Conteo global de usuarios en sesión (isLoged) — client-side, ya que GET /users
+    // no filtra ni cuenta por isLoged. Trae una página amplia y cuenta la bandera.
+    getActiveCount: async () => {
+        try {
+            const { data } = await UserService.getUsers({ page: 1, limit: 500 }, { fullName: '', email: '' });
+            set({ activeCount: data.filter(u => u.isLoged).length });
+        } catch {
+            set({ activeCount: 0 });
         }
     },
     createUser: async (user) => {
