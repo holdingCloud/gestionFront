@@ -37,6 +37,10 @@ const storeApi: StateCreator<AuthState> = (set, get) => ({
         }
     },
     logoutUser: () => {
+        const { accessToken, refreshToken } = get();
+        // Notifica al backend en segundo plano (borra la sesión Redis → isLoged=false).
+        // No se hace await para que la UI navegue al login al instante.
+        if (accessToken) AuthService.logout(accessToken, refreshToken);
         set({ status: 'unauthorized', accessToken: undefined, refreshToken: undefined, user: undefined });
     },
     getUser: () => {
