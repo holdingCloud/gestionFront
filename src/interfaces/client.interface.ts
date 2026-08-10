@@ -43,7 +43,7 @@ export interface ClientResponse {
     id: number;
     fullname: string;
     phone: string;
-    email: string;
+    email: string | null;
     companyId: number | null;
     company?: { id: number; name: string; description?: string | null } | null;
     direccionId?: number | null;
@@ -70,7 +70,7 @@ export interface DireccionPrincipalBody {
 export interface ClientBody {
     fullname: string;
     phone: string;
-    email: string;
+    email?: string | null;
     companyId?: number;
     frequency?: number;
     direccionPrincipal?: DireccionPrincipalBody;
