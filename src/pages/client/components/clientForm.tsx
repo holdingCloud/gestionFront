@@ -54,7 +54,7 @@ const mapClientToValues = (c: ClientResponse) => ({
 
 const validationSchema = Yup.object({
     fullname: Yup.string().min(3, 'Mínimo 3 caracteres').max(100, 'Máximo 100 caracteres').required('Requerido'),
-    email: Yup.string().email('Debe ser un email válido').required('Requerido'),
+    email: Yup.string().email('Debe ser un email válido').nullable(),
     phone: Yup.string()
         .matches(/^\+56 9 \d{8}$/, 'Formato inválido. Ej: +56 9 95720483')
         .required('Requerido'),
@@ -123,9 +123,11 @@ export const ClientForm = ({
                 const freq = vals.frequency !== '' && vals.frequency !== undefined ? Number(vals.frequency) : undefined;
                 const compId = vals.companyId !== '' && vals.companyId !== undefined ? Number(vals.companyId) : undefined;
 
+                const email = vals.email?.trim() ? vals.email.trim() : null;
+
                 const payload: ClientBody = {
                     fullname: vals.fullname,
-                    email: vals.email,
+                    email,
                     phone: vals.phone,
                     ...(freq ? { frequency: freq } : {}),
                     ...(compId ? { companyId: compId } : {}),
@@ -184,7 +186,7 @@ export const ClientForm = ({
                     fullWidth size="small" name="fullname" label="Nombre completo"
                     value={values.fullname} onChange={handleChange} onBlur={handleBlur}
                     error={touched.fullname && Boolean(errors.fullname)}
-                    helperText={touched.fullname && errors.fullname}
+                    helperText={(touched.fullname && errors.fullname) || 'Opcional'}
                     sx={{ mb: 2 }}
                 />
 
@@ -193,7 +195,7 @@ export const ClientForm = ({
                         fullWidth size="small" name="email" label="Email"
                         value={values.email} onChange={handleChange} onBlur={handleBlur}
                         error={touched.email && Boolean(errors.email)}
-                        helperText={touched.email && errors.email}
+                        helperText={(touched.email && errors.email) || 'Opcional'}
                     />
                     <TextField
                         fullWidth size="small" name="phone" label="Teléfono"

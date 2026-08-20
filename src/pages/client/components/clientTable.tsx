@@ -14,14 +14,15 @@ const AVATAR_COLORS = [
     '#ef4444', '#06b6d4', '#84cc16', '#f97316', '#6366f1',
 ];
 
-function getAvatarColor(name: string): string {
+function getAvatarColor(name?: string | null): string {
+    const value = name ?? '';
     let hash = 0;
-    for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    for (let i = 0; i < value.length; i++) hash = value.charCodeAt(i) + ((hash << 5) - hash);
     return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
 }
 
-function getInitials(name: string): string {
-    return name.split(' ').map(n => n[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
+function getInitials(name?: string | null): string {
+    return (name ?? '').split(' ').map(n => n[0]).filter(Boolean).slice(0, 2).join('').toUpperCase() || '?';
 }
 
 const STATUS_CHIP_SX: Record<string, object> = {
@@ -213,8 +214,8 @@ export const ClientTable = ({
                                                     {subtitle}
                                                 </Typography>
                                             )}
-                                            <Typography variant="caption" color="text.secondary" noWrap sx={{ display: 'block', lineHeight: 1.3 }}>
-                                                {row.fullname}
+                                            <Typography variant="caption" color={row.fullname ? 'text.secondary' : 'text.disabled'} noWrap sx={{ display: 'block', lineHeight: 1.3 }}>
+                                                {row.fullname || 'Sin nombre'}
                                             </Typography>
                                         </Box>
                                     </Box>
