@@ -186,7 +186,7 @@ export const ClientForm = ({
                     fullWidth size="small" name="fullname" label="Nombre completo"
                     value={values.fullname} onChange={handleChange} onBlur={handleBlur}
                     error={touched.fullname && Boolean(errors.fullname)}
-                    helperText={touched.fullname && errors.fullname}
+                    helperText={(touched.fullname && errors.fullname) || 'Opcional'}
                     sx={{ mb: 2 }}
                 />
 
